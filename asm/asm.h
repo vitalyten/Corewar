@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/05 20:05:01 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/05 20:37:50 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	storeline(t_en *env, char *str, int i);
 t_src	*srcalloc(char *str, int i);
 void	checkfile(t_en *env);
 int		isempty(char *str);
-void	showerr(void);
+void	showerr(char *msg);
 void	envinit(t_en *env);
 void	freesrc(t_en *env);
 

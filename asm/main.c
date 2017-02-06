@@ -6,15 +6,15 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/05 20:04:39 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/05 20:42:32 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
 
-void	showerr(void)
+void	showerr(char *msg)
 {
-	ft_printf("ERROR\n");
+	ft_printf("%s\n", msg);
 	exit(EXIT_FAILURE);
 }
 
@@ -22,7 +22,7 @@ void	envinit(t_en *env)
 {
 	env->header = (t_header *)malloc(sizeof(t_header));
 	if (!env->header)
-		showerr();
+		showerr("malloc error");
 	env->header->magic = COREWAR_EXEC_MAGIC;
 	env->header->prog_size = 0;
 	env->file = NULL;
@@ -52,7 +52,7 @@ int		main(int ac, char **av)
 
 	envinit(&env);
 	if (ac < 2)
-		showerr();
+		showerr("usage: ./asm file1.s ...");
 	i = 0;
 	while (av[++i])
 	{

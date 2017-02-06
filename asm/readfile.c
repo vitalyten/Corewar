@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/05 19:59:55 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/05 20:02:50 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/05 20:41:47 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ void	checkfile(t_en *env)
 
 	len = ft_strlen(env->file);
 	if (len < 3)
-		showerr();
+		showerr("wrong filename");
 	if (env->file[len - 1] != 's' || env->file[len - 2] != '.')
-		showerr();
+		showerr("wrong filename");
 }
 
 t_src	*srcalloc(char *str, int i)
@@ -39,7 +39,7 @@ t_src	*srcalloc(char *str, int i)
 	t_src *src;
 
 	if (!(src = (t_src *)malloc(sizeof(t_src))))
-		showerr();
+		showerr("malloc error");
 	src->i = i;
 	src->line = str;
 	src->next = NULL;
@@ -70,7 +70,7 @@ void	readfile(t_en *env)
 
 	i = 0;
 	if ((fd = open(env->file, O_RDONLY)) == -1)
-		showerr();
+		showerr("can't open file");
 	while (get_next_line(fd, &str) > 0)
 		if (str[0] != COMMENT_CHAR && !isempty(str))
 		{
