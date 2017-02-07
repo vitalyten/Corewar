@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/05 20:42:32 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/06 22:05:57 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,35 @@ void	freesrc(t_en *env)
 	}
 }
 
+void	parsename(t_en *env, char *str)
+{
+	char	*tmp1;
+	char	*tmp2;
+
+	tmp1 = ft_strstr(str, NAME_CMD_STRING);
+	if (!isempty(str, 0, tmp1 - str))
+		showerr("syntax error");
+	if (!(tmp2 = ft_strchr(str, '\"')))
+		showerr("name missing");
+	
+	if ((tmp1 = ft_strrchr(str, '\"')) == tmp2)
+		showerr("name missing");
+	ft_printf("%s\ndif %d\n",env->file, tmp1 - str);
+}
+
+void	parsesrc(t_en *env)
+{
+	t_src *src;
+
+	src = env->src;
+	while (src)
+	{
+		if (ft_strstr(src->line, NAME_CMD_STRING))
+			parsename(env, src->line);
+		src = src->next;
+	}
+}
+
 int		main(int ac, char **av)
 {
 	t_en	env;
@@ -59,6 +88,7 @@ int		main(int ac, char **av)
 		env.file = av[i];
 		checkfile(&env);
 		readfile(&env);
+		parsesrc(&env);
 	}
 	tmp = env.src;
 	while (tmp)

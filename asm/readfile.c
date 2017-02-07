@@ -6,19 +6,19 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/05 19:59:55 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/05 20:41:47 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/06 19:38:33 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
 
-int		isempty(char *str)
+int		isempty(char *str, int start, int end)
 {
-	while (*str)
+	while (str[start] && start < end)
 	{
-		if (*str != ' ' && *str != '\t')
+		if (str[start] != ' ' && str[start] != '\t')
 			return (0);
-		str++;
+		start++;
 	}
 	return (1);
 }
@@ -72,7 +72,7 @@ void	readfile(t_en *env)
 	if ((fd = open(env->file, O_RDONLY)) == -1)
 		showerr("can't open file");
 	while (get_next_line(fd, &str) > 0)
-		if (str[0] != COMMENT_CHAR && !isempty(str))
+		if (str[0] != COMMENT_CHAR && !isempty(str, 0, ft_strlen(str)))
 		{
 			if ((tmp = ft_strchr(str, ';')))
 				*tmp = '\0';
