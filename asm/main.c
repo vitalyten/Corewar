@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/07 20:47:53 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/07 21:51:50 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@ void	envinit(t_en *env)
 	env->header->prog_size = 0;
 	env->file = NULL;
 	env->src = NULL;
+	env->code = NULL;
+	env->header->prog_name[0] = 0;
+	env->header->comment[0] = 0;
 }
 
 void	freesrc(t_en *env)
@@ -62,6 +65,8 @@ void	parsename(t_en *env, char *str)
 	int		start;
 	int		finish;
 
+	if (env->header->prog_name[0])
+		showerr("name error");
 	tmp1 = ft_strstr(str, NAME_CMD_STRING);
 	if (!isempty(str, 0, tmp1 - str))
 		showerr("syntax error");
@@ -89,6 +94,8 @@ void	parsecomment(t_en *env, char *str)
 	int		start;
 	int		finish;
 
+	if (env->header->comment[0])
+		showerr("comment error");
 	tmp1 = ft_strstr(str, COMMENT_CMD_STRING);
 	if (!isempty(str, 0, tmp1 - str))
 		showerr("syntax error");
@@ -109,6 +116,11 @@ void	parsecomment(t_en *env, char *str)
 	ft_strncpy(env->header->comment, tmp2 + 1, tmp1 - tmp2 - 1);
 }
 
+// void	addcode(t_code *code, char *lable, char *op)
+// {
+
+// }
+
 void	parselabel(t_en *env, char *str)
 {
 	char	*tmp;
@@ -118,7 +130,10 @@ void	parselabel(t_en *env, char *str)
 	tmp = ft_strchr(str, LABEL_CHAR);
 	if (!islabel(str, 0, tmp - str))
 		showerr("invalid label");
-	ft_printf("%s\nlabel %s\n",env->file, str);
+	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
+		showerr("label syntax error");
+	*tmp = '\0';
+	ft_printf("%s\n", env->file);
 }
 
 void	parsesrc(t_en *env)
