@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/07 21:47:15 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/09 21:26:23 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct		s_en
 	t_src		*src;
 	t_code		*code;
 	char		*file;
+	int			size;
 }					t_en;
 
 typedef struct		s_op

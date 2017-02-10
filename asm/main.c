@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/07 21:51:50 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/09 21:42:01 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	envinit(t_en *env)
 	env->code = NULL;
 	env->header->prog_name[0] = 0;
 	env->header->comment[0] = 0;
+	env->size = 0;
 }
 
 void	freesrc(t_en *env)
@@ -116,10 +117,29 @@ void	parsecomment(t_en *env, char *str)
 	ft_strncpy(env->header->comment, tmp2 + 1, tmp1 - tmp2 - 1);
 }
 
-// void	addcode(t_code *code, char *lable, char *op)
-// {
+void	addcode(t_en *env, char *label, char *op)
+{
+	t_code *tmp;
+	t_code *code;
 
-// }
+	tmp = (t_code *)malloc(sizeof(t_code));
+	tmp->next = NULL;
+	tmp->op = NULL;
+	tmp->label = NULL;
+	if (label)
+		tmp->label = ft_strdup(label);
+	if (op)
+		tmp->op = op;
+	if (env->code)
+	{
+		code = env->code;
+		while (code->next)
+			code = code->next;
+		code->next = tmp;
+	}
+	else
+		env->code = tmp;
+}
 
 void	parselabel(t_en *env, char *str)
 {
@@ -133,7 +153,28 @@ void	parselabel(t_en *env, char *str)
 	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
 		showerr("label syntax error");
 	*tmp = '\0';
-	ft_printf("%s\n", env->file);
+	addcode(env, str, NULL);
+}
+
+void	parseop(t_en *env, char *str)
+{
+	char	**spl;
+	int 	len;
+
+	while (ft_iswhitespace(*str))
+		str++;
+	len = ft_strlen(str);
+	while (ft_iswhitespace(str[len - 1]))
+		len--;
+	str[len] = '\0';
+	spl = ft_strsplit(str, ' ');
+	// while (spl)
+	// {
+	// 	ft_printf("%s\n", *spl);
+	// 	spl++;
+	// }
+	ft_printf("parseop %s\n", str);
+	env->size++;
 }
 
 void	parsesrc(t_en *env)
@@ -148,10 +189,17 @@ void	parsesrc(t_en *env)
 			parsename(env, src->line);
 		else if (ft_strstr(src->line, COMMENT_CMD_STRING))
 			parsecomment(env, src->line);
-		else if ((tmp = ft_strchr(src->line, LABEL_CHAR)))
+		else if ((tmp = ft_strchr(src->line, LABEL_CHAR))
+			&& !ft_strchr(src->line, DIRECT_CHAR))
+		{
 			if (tmp - src->line > 0)
-				if (*(tmp - 1) != DIRECT_CHAR)
+			{
+				//if (*(tmp - 1) != DIRECT_CHAR)
 					parselabel(env, src->line);
+			}
+		}
+		else
+			parseop(env, src->line);
 		src = src->next;
 	}
 }
@@ -160,6 +208,7 @@ int		main(int ac, char **av)
 {
 	t_en	env;
 	t_src	*tmp;
+	t_code	*code;
 	int		i;
 
 	envinit(&env);
@@ -179,6 +228,51 @@ int		main(int ac, char **av)
 		ft_printf("%-4d %s\n", tmp->i, tmp->line);
 		tmp = tmp->next;
 	}
+	code = env.code;
+	while (code)
+	{
+		if (code->label)
+			ft_printf("label = %s\n", code->label);
+		code = code->next;
+	}
 	freesrc(&env);
 	return (0);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
