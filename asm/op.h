@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2013/10/04 11:33:27 by zaz               #+#    #+#             */
-/*   Updated: 2017/02/07 21:45:38 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/13 18:07:43 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,10 @@
 
 typedef char	t_arg_type;
 
-#define T_REG					1
-#define T_DIR					2
-#define T_IND					4
-#define T_LAB					8
+#define T_REG					1 // 0001
+#define T_DIR					2 // 0010
+#define T_IND					4 // 0100
+#define T_LAB					8 // 1000
 
 /*
 **

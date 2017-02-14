@@ -6,13 +6,27 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2013/10/04 11:43:01 by zaz               #+#    #+#             */
-/*   Updated: 2017/02/05 17:19:59 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/13 18:55:21 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "op.h"
+#include "asm.h"
 
-t_op    op_tab[17] =
+/*
+typedef struct		s_op
+{
+	char	*name;
+	int		nargs;
+	char	args[MAX_ARGS_NUMBER];
+	char	opcode;
+	int		ncycles;
+	char	*rep;
+	int		has_acb; // ?
+	int		is_index; // ?
+}					t_op;
+*/
+
+t_op    g_ops[17] =
 {
 	{"live", 1, {T_DIR}, 1, 10, "alive", 0, 0},
 	{"ld", 2, {T_DIR | T_IND, T_REG}, 2, 5, "load", 1, 0},

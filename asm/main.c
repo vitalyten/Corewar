@@ -6,11 +6,56 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/09 21:42:01 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/13 21:36:46 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
+
+t_op    g_ops[17] =
+{
+	{"live", 1, {T_DIR}, 1, 10, "alive", 0, 0},
+	{"ld", 2, {T_DIR | T_IND, T_REG}, 2, 5, "load", 1, 0},
+	{"st", 2, {T_REG, T_IND | T_REG}, 3, 5, "store", 1, 0},
+	{"add", 3, {T_REG, T_REG, T_REG}, 4, 10, "addition", 1, 0},
+	{"sub", 3, {T_REG, T_REG, T_REG}, 5, 10, "soustraction", 1, 0},
+	{"and", 3, {T_REG | T_DIR | T_IND, T_REG | T_IND | T_DIR, T_REG}, 6, 6,
+		"et (and  r1, r2, r3   r1&r2 -> r3", 1, 0},
+	{"or", 3, {T_REG | T_IND | T_DIR, T_REG | T_IND | T_DIR, T_REG}, 7, 6,
+		"ou  (or   r1, r2, r3   r1 | r2 -> r3", 1, 0},
+	{"xor", 3, {T_REG | T_IND | T_DIR, T_REG | T_IND | T_DIR, T_REG}, 8, 6,
+		"ou (xor  r1, r2, r3   r1^r2 -> r3", 1, 0},
+	{"zjmp", 1, {T_DIR}, 9, 20, "jump if zero", 0, 1},
+	{"ldi", 3, {T_REG | T_DIR | T_IND, T_DIR | T_REG, T_REG}, 10, 25,
+		"load index", 1, 1},
+	{"sti", 3, {T_REG, T_REG | T_DIR | T_IND, T_DIR | T_REG}, 11, 25,
+		"store index", 1, 1},
+	{"fork", 1, {T_DIR}, 12, 800, "fork", 0, 1},
+	{"lld", 2, {T_DIR | T_IND, T_REG}, 13, 10, "long load", 1, 0},
+	{"lldi", 3, {T_REG | T_DIR | T_IND, T_DIR | T_REG, T_REG}, 14, 50,
+		"long load index", 1, 1},
+	{"lfork", 1, {T_DIR}, 15, 1000, "long fork", 0, 1},
+	{"aff", 1, {T_REG}, 16, 2, "aff", 1, 0},
+	{0, 0, {0}, 0, 0, 0, 0, 0}
+};
+
+void	trimstr(char **str)
+{
+	int len;
+
+	if (str && *str)
+	{
+		while (ft_iswhitespace(**str))
+			(*str)++;
+		len = ft_strlen(*str);
+		if (len > 0)
+		{
+			while (ft_iswhitespace((*str)[len - 1]))
+				len--;
+			(*str)[len] = '\0';
+		}
+	}
+}
 
 void	showerr(char *msg)
 {
@@ -48,75 +93,6 @@ void	freesrc(t_en *env)
 	}
 }
 
-int		islabel(char *str, int start, int end)
-{
-	while (str[start] && start < end)
-	{
-		if (!ft_strchr(LABEL_CHARS, str[start]))
-			return (0);
-		start++;
-	}
-	return (1);
-}
-
-void	parsename(t_en *env, char *str)
-{
-	char	*tmp1;
-	char	*tmp2;
-	int		start;
-	int		finish;
-
-	if (env->header->prog_name[0])
-		showerr("name error");
-	tmp1 = ft_strstr(str, NAME_CMD_STRING);
-	if (!isempty(str, 0, tmp1 - str))
-		showerr("syntax error");
-	if (!(tmp2 = ft_strchr(str, '\"')))
-		showerr("name missing");
-	start = ft_strlen(NAME_CMD_STRING) + tmp1 - str;
-	finish = tmp2 - str;
-	if (!isempty(str, start, finish) || finish - start < 1)
-		showerr("syntax error");
-	if ((tmp1 = ft_strrchr(str, '\"')) == tmp2)
-		showerr("name missing");
-	if (tmp1 - tmp2 - 1 > PROG_NAME_LENGTH)
-		showerr("name too long");
-	if (!islabel(str, finish + 1, tmp1 - str)) // reformat name
-		showerr("wrong name format");
-	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
-		showerr("syntax error");
-	ft_strncpy(env->header->prog_name, tmp2 + 1, tmp1 - tmp2 - 1);
-}
-
-void	parsecomment(t_en *env, char *str)
-{
-	char	*tmp1;
-	char	*tmp2;
-	int		start;
-	int		finish;
-
-	if (env->header->comment[0])
-		showerr("comment error");
-	tmp1 = ft_strstr(str, COMMENT_CMD_STRING);
-	if (!isempty(str, 0, tmp1 - str))
-		showerr("syntax error");
-	if (!(tmp2 = ft_strchr(str, '\"')))
-		showerr("comment missing");
-	start = ft_strlen(COMMENT_CMD_STRING) + tmp1 - str;
-	finish = tmp2 - str;
-	if (!isempty(str, start, finish) || finish - start < 1)
-		showerr("syntax error");
-	if ((tmp1 = ft_strrchr(str, '\"')) == tmp2)
-		showerr("comment missing");
-	if (tmp1 - tmp2 - 1 > COMMENT_LENGTH)
-		showerr("comment too long");
-	// if (!islabel(str, finish + 1, tmp1 - str)) check comment format
-	// 	showerr("wrong name format");
-	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
-		showerr("syntax error");
-	ft_strncpy(env->header->comment, tmp2 + 1, tmp1 - tmp2 - 1);
-}
-
 void	addcode(t_en *env, char *label, char *op)
 {
 	t_code *tmp;
@@ -129,7 +105,7 @@ void	addcode(t_en *env, char *label, char *op)
 	if (label)
 		tmp->label = ft_strdup(label);
 	if (op)
-		tmp->op = op;
+		tmp->op = ft_strdup(op);
 	if (env->code)
 	{
 		code = env->code;
@@ -141,39 +117,92 @@ void	addcode(t_en *env, char *label, char *op)
 		env->code = tmp;
 }
 
-void	parselabel(t_en *env, char *str)
+int		spllen(char **spl)
 {
-	char	*tmp;
+	int i;
 
-	while (ft_iswhitespace(*str))
-		str++;
-	tmp = ft_strchr(str, LABEL_CHAR);
-	if (!islabel(str, 0, tmp - str))
-		showerr("invalid label");
-	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
-		showerr("label syntax error");
-	*tmp = '\0';
-	addcode(env, str, NULL);
+	i = 0;
+	if (spl && *spl)
+		while (spl[i])
+			i++;
+	return (i);
+}
+
+void	checkreg(char *arg, int i, int op)
+{
+	if (!(T_REG & g_ops[op].args[i]))
+		showerr("wrong argument");
+	if (!*arg)
+		showerr("arg syntax error");
+	while (*arg)
+	{
+		if (!ft_isdigit(*arg))
+			showerr("arg syntax error");
+		arg++;
+	}
+}
+
+void	checkind(char *arg, int i, int op)
+{
+	if (!(T_IND & g_ops[op].args[i]))
+		showerr("wrong argument");
+	while (*arg)
+	{
+		if (!ft_isdigit(*arg))
+			showerr("arg syntax error");
+		arg++;
+	}
+}
+
+void	validargs(char **args, int op)
+{
+	int i;
+	int len;
+
+	i = 0;
+	while (args[i])
+	{
+		trimstr(&args[i]);
+		len = ft_strlen(args[i]);
+		if ((args[i][len - 1] == SEPARATOR_CHAR && i == g_ops[op].nargs - 1) ||
+			(args[i][len - 1] != SEPARATOR_CHAR && i < g_ops[op].nargs - 1))
+			showerr("syntax error");
+		if (args[i][len - 1] == SEPARATOR_CHAR)
+			args[i][len - 1] = '\0';
+		if (args[i][0] == 'r')
+			checkreg(args[i] + 1, i, op);
+		if (ft_isdigit(args[i][0]))
+			checkind(args[i], i, op);
+		ft_printf("arg#%d   %s\n",i, args[i]);
+		i++;
+	}
 }
 
 void	parseop(t_en *env, char *str)
 {
 	char	**spl;
-	int 	len;
+	int		len;
+	int		i;
 
-	while (ft_iswhitespace(*str))
-		str++;
-	len = ft_strlen(str);
-	while (ft_iswhitespace(str[len - 1]))
-		len--;
-	str[len] = '\0';
+	i = 0;
+	trimstr(&str);
 	spl = ft_strsplit(str, ' ');
-	// while (spl)
-	// {
-	// 	ft_printf("%s\n", *spl);
-	// 	spl++;
-	// }
-	ft_printf("parseop %s\n", str);
+	len = spllen(spl);
+	if (len > 0)
+	{
+		while (i < 16)
+		{
+			if(!ft_strcmp(spl[0], g_ops[i].name))
+				break ;
+			i++;
+		}
+		if (i == 16)
+			showerr("name syntax error");
+		if (g_ops[i].nargs != len - 1)
+			showerr("wrong number of arguments");
+		validargs(spl + 1, i);
+	}
+	ft_printf("parseop   %s\n", str);
 	env->size++;
 }
 
