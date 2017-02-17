@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/13 21:36:46 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/16 22:29:15 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,111 +126,6 @@ int		spllen(char **spl)
 		while (spl[i])
 			i++;
 	return (i);
-}
-
-void	checkreg(char *arg, int i, int op)
-{
-	if (!(T_REG & g_ops[op].args[i]))
-		showerr("wrong argument");
-	if (!*arg)
-		showerr("arg syntax error");
-	while (*arg)
-	{
-		if (!ft_isdigit(*arg))
-			showerr("arg syntax error");
-		arg++;
-	}
-}
-
-void	checkind(char *arg, int i, int op)
-{
-	if (!(T_IND & g_ops[op].args[i]))
-		showerr("wrong argument");
-	while (*arg)
-	{
-		if (!ft_isdigit(*arg))
-			showerr("arg syntax error");
-		arg++;
-	}
-}
-
-void	validargs(char **args, int op)
-{
-	int i;
-	int len;
-
-	i = 0;
-	while (args[i])
-	{
-		trimstr(&args[i]);
-		len = ft_strlen(args[i]);
-		if ((args[i][len - 1] == SEPARATOR_CHAR && i == g_ops[op].nargs - 1) ||
-			(args[i][len - 1] != SEPARATOR_CHAR && i < g_ops[op].nargs - 1))
-			showerr("syntax error");
-		if (args[i][len - 1] == SEPARATOR_CHAR)
-			args[i][len - 1] = '\0';
-		if (args[i][0] == 'r')
-			checkreg(args[i] + 1, i, op);
-		if (ft_isdigit(args[i][0]))
-			checkind(args[i], i, op);
-		ft_printf("arg#%d   %s\n",i, args[i]);
-		i++;
-	}
-}
-
-void	parseop(t_en *env, char *str)
-{
-	char	**spl;
-	int		len;
-	int		i;
-
-	i = 0;
-	trimstr(&str);
-	spl = ft_strsplit(str, ' ');
-	len = spllen(spl);
-	if (len > 0)
-	{
-		while (i < 16)
-		{
-			if(!ft_strcmp(spl[0], g_ops[i].name))
-				break ;
-			i++;
-		}
-		if (i == 16)
-			showerr("name syntax error");
-		if (g_ops[i].nargs != len - 1)
-			showerr("wrong number of arguments");
-		validargs(spl + 1, i);
-	}
-	ft_printf("parseop   %s\n", str);
-	env->size++;
-}
-
-void	parsesrc(t_en *env)
-{
-	t_src	*src;
-	char	*tmp;
-
-	src = env->src;
-	while (src)
-	{
-		if (ft_strstr(src->line, NAME_CMD_STRING))
-			parsename(env, src->line);
-		else if (ft_strstr(src->line, COMMENT_CMD_STRING))
-			parsecomment(env, src->line);
-		else if ((tmp = ft_strchr(src->line, LABEL_CHAR))
-			&& !ft_strchr(src->line, DIRECT_CHAR))
-		{
-			if (tmp - src->line > 0)
-			{
-				//if (*(tmp - 1) != DIRECT_CHAR)
-					parselabel(env, src->line);
-			}
-		}
-		else
-			parseop(env, src->line);
-		src = src->next;
-	}
 }
 
 int		main(int ac, char **av)

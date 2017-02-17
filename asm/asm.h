@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/13 20:26:18 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/16 22:34:45 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ typedef struct		s_op
 	int		is_index; // ?
 }					t_op;
 
+extern t_op			g_ops[17];
+
 // t_op    g_ops[17] =
 // {
 // 	{"live", 1, {T_DIR}, 1, 10, "alive", 0, 0},
@@ -94,15 +96,24 @@ void				storeline(t_en *env, char *str, int i);
 t_src				*srcalloc(char *str, int i);
 void				checkfile(t_en *env);
 int					isempty(char *str, int start, int end);
-void				showerr(char *msg);
+void				showerr(char *msg); // main
 void				envinit(t_en *env);
 void				freesrc(t_en *env);
+void				parsesrc(t_en *env);
 void				parsename(t_en *env, char *str);
 void				parsecomment(t_en *env, char *str);
 void				parselabel(t_en *env, char *str);
+void				parseop(t_en *env, char *str);
+char				*getop(char *str);
+char				*getargs(char *str);
+void				validargs(char **args, int op);
+void				checkdir(char *arg, int i, int op);
+void				checkind(char *arg, int i, int op);
+void				checkreg(char *arg, int i, int op);
 int					islabel(char *str, int start, int end);
 void				trimstr(char **str); // main
 void				addcode(t_en *env, char *label, char *op); // main
+int					spllen(char **spl); // main
 
 #endif
 
