@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/16 22:34:45 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/22 15:42:19 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,11 @@ typedef struct		s_op
 {
 	char	*name;
 	int		nargs;
-	char	args[MAX_ARGS_NUMBER];
-	char	opcode;
+	int		args[MAX_ARGS_NUMBER];
+	int		opcode;
 	int		ncycles;
 	char	*rep;
-	int		has_acb; // ?
+	int		acb; // arguments coding byte
 	int		is_index; // ?
 }					t_op;
 

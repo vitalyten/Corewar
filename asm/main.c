@@ -6,11 +6,25 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/16 22:29:15 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/17 14:48:25 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
+
+/*
+typedef struct		s_op
+{
+	char	*name;
+	int		nargs;
+	char	args[MAX_ARGS_NUMBER];
+	char	opcode;
+	int		ncycles;
+	char	*rep;
+	int		has_acb; // ?
+	int		is_index; // ?
+}					t_op;
+*/
 
 t_op    g_ops[17] =
 {
