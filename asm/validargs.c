@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/16 22:27:31 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/22 18:19:23 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	validargs(char **args, int op)
 		trimstr(&args[i]);
 		if (args[i][0] == 'r')
 			checkreg(args[i] + 1, i, op);
-		else if (ft_isdigit(args[i][0]))
+		else if (ft_isdigit(args[i][0])) // wrong
 			checkind(args[i], i, op);
 		else if (args[i][0] == DIRECT_CHAR)
 			checkdir(args[i] + 1, i, op);

@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/16 22:23:01 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/22 18:18:29 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	parsesrc(t_en *env)
 		else if (ft_strstr(src->line, COMMENT_CMD_STRING))
 			parsecomment(env, src->line);
 		else if ((tmp = ft_strchr(src->line, LABEL_CHAR))
-			&& !ft_strchr(src->line, DIRECT_CHAR))
+			&& !ft_strchr(src->line, DIRECT_CHAR)) // wrong
 			parselabel(env, src->line);
 		else
 			parseop(env, src->line);
