@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/22 18:18:29 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/23 20:36:28 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,14 @@ void	parselabel(t_en *env, char *str)
 {
 	char	*tmp;
 
-	trimstr(&str);
 	tmp = ft_strchr(str, LABEL_CHAR);
-	if (!islabel(str, 0, tmp - str))
-		showerr("invalid label");
 	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
 		showerr("label syntax error");
-	*tmp = '\0';
-	addcode(env, str, NULL);
+	tmp = ft_strsub(str, 0, tmp - str);
+	// *tmp = '\0';
+	ft_printf("label = %s\n", tmp);
+	addcode(env, tmp, NULL);
+	ft_strdel(&tmp);
 }
 
 void	parsesrc(t_en *env)
@@ -103,12 +103,13 @@ void	parsesrc(t_en *env)
 	src = env->src;
 	while (src)
 	{
+		ft_printf("src = %s\n", src->line);
 		if (ft_strstr(src->line, NAME_CMD_STRING))
 			parsename(env, src->line);
 		else if (ft_strstr(src->line, COMMENT_CMD_STRING))
 			parsecomment(env, src->line);
 		else if ((tmp = ft_strchr(src->line, LABEL_CHAR))
-			&& !ft_strchr(src->line, DIRECT_CHAR)) // wrong
+			&& islabel(src->line, 0, tmp - src->line))
 			parselabel(env, src->line);
 		else
 			parseop(env, src->line);

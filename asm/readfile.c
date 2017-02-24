@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/05 19:59:55 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/06 19:38:33 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/23 20:21:36 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,17 +66,24 @@ void	readfile(t_en *env)
 	int		fd;
 	int		i;
 	char	*str;
+	char	*ln;
 	char	*tmp;
 
 	i = 0;
 	if ((fd = open(env->file, O_RDONLY)) == -1)
 		showerr("can't open file");
-	while (get_next_line(fd, &str) > 0)
-		if (str[0] != COMMENT_CHAR && !isempty(str, 0, ft_strlen(str)))
+	while (get_next_line(fd, &ln) > 0)
+	{
+		if (ln[0] != COMMENT_CHAR && !isempty(ln, 0, ft_strlen(ln)))
 		{
+			str = ft_strdup(ln);
 			if ((tmp = ft_strchr(str, ';')))
-				*tmp = '\0';
-			storeline(env, str, ++i);
+				str = strdupfree(str, 0, tmp - str);
+			str = trimfree(str);
+			if (ft_strlen(str))
+				storeline(env, str, ++i);
 		}
+		ft_strdel(&ln);
+	}
 	close(fd);
 }

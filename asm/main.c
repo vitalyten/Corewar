@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/17 14:48:25 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/23 20:17:04 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,23 +53,69 @@ t_op    g_ops[17] =
 	{0, 0, {0}, 0, 0, 0, 0, 0}
 };
 
-void	trimstr(char **str)
+char	*trimfree(char *s)
 {
-	int len;
+	size_t	start;
+	size_t	end;
+	char	*ret;
 
-	if (str && *str)
+	ret = NULL;
+	if (s)
 	{
-		while (ft_iswhitespace(**str))
-			(*str)++;
-		len = ft_strlen(*str);
-		if (len > 0)
+		start = 0;
+		end = ft_strlen(s);
+		while (ft_iswhitespace(s[start]))
+			start++;
+		while (ft_iswhitespace(s[end - 1]))
+			end--;
+		if (end < start)
 		{
-			while (ft_iswhitespace((*str)[len - 1]))
-				len--;
-			(*str)[len] = '\0';
+			ft_strdel(&s);
+			return (ft_strnew(0));
 		}
+		if (!(ret = ft_strnew(end - start)))
+			showerr("malloc error tf");
+		ret = ft_strncpy(ret, s + start, end - start);
+		ft_strdel(&s);
 	}
+	return (ret);
 }
+
+char	*strdupfree(char *src, int start, int end)
+{
+	char	*ret;
+	int		i;
+
+	if (!src)
+		return (NULL);
+	ft_printf("srcdf = %s start = %d end = %d\n", src, start, end);
+	if (!(ret = (char *)malloc(sizeof(char) * (end - start + 1))))
+		showerr("malloc error df");
+	i = 0;
+	while (start < end)
+		ret[i++] = src[start++];
+	ret[i] = '\0';
+	ft_strdel(&src);
+	return (ret);
+}
+
+// void	trimstr(char **str)
+// {
+// 	int len;
+
+// 	if (str && *str)
+// 	{
+// 		while (ft_iswhitespace(**str))
+// 			(*str)++;
+// 		len = ft_strlen(*str);
+// 		if (len > 0)
+// 		{
+// 			while (ft_iswhitespace((*str)[len - 1]))
+// 				len--;
+// 			(*str)[len] = '\0';
+// 		}
+// 	}
+// }
 
 void	showerr(char *msg)
 {
@@ -102,7 +148,8 @@ void	freesrc(t_en *env)
 	{
 		tmp = src;
 		src = src->next;
-		ft_strdel(&tmp->line);
+		ft_printf("line = %s\n", tmp->line);
+		ft_strdel(&(tmp->line));
 		free(tmp);
 	}
 }

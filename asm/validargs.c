@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/22 18:19:23 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/23 20:09:57 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,15 @@
 
 void	checkreg(char *arg, int i, int op)
 {
+	int r;
+
 	if (!(T_REG & g_ops[op].args[i]))
 		showerr("wrong argument");
 	if (!*arg)
 		showerr("arg syntax error");
+	r = ft_atoi(arg);
+	if (r > REG_NUMBER || r < 1)
+		showerr("wrong registry number");
 	while (*arg)
 	{
 		if (!ft_isdigit(*arg))
@@ -30,12 +35,20 @@ void	checkind(char *arg, int i, int op)
 {
 	if (!(T_IND & g_ops[op].args[i]))
 		showerr("wrong argument");
-	while (*arg)
+	if (ft_strlen(arg) < 1)
+		showerr("arg syntax error");
+	if (arg[0] == LABEL_CHAR)
 	{
-		if (!ft_isdigit(*arg))
-			showerr("arg syntax error");
-		arg++;
+		if (!islabel(arg, 1, ft_strlen(arg)))
+			showerr("invalid label");
 	}
+	else
+		while (*arg)
+		{
+			if (!ft_isdigit(*arg))
+				showerr("arg syntax error");
+			arg++;
+		}
 }
 
 void	checkdir(char *arg, int i, int op)
@@ -68,15 +81,13 @@ void	validargs(char **args, int op)
 	i = 0;
 	while (args[i])
 	{
-		trimstr(&args[i]);
+		args[i] = trimfree(args[i]);
 		if (args[i][0] == 'r')
 			checkreg(args[i] + 1, i, op);
-		else if (ft_isdigit(args[i][0])) // wrong
-			checkind(args[i], i, op);
 		else if (args[i][0] == DIRECT_CHAR)
 			checkdir(args[i] + 1, i, op);
 		else
-			showerr("syntax error");
+			checkind(args[i], i, op);
 		i++;
 	}
 }

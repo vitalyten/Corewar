@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/22 19:43:20 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/23 19:28:56 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,8 @@ int					islabel(char *str, int start, int end);
 void				trimstr(char **str); // main
 void				addcode(t_en *env, char *label, char *op); // main
 int					spllen(char **spl); // main
+char				*trimfree(char *s);
+char				*strdupfree(char *src, int start, int end);
 
 #endif
 
