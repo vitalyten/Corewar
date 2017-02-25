@@ -6,13 +6,13 @@
 #    By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/05 17:57:52 by vtenigin          #+#    #+#              #
-#    Updated: 2017/02/16 22:29:51 by vtenigin         ###   ########.fr        #
+#    Updated: 2017/02/24 20:30:33 by vtenigin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = asm
 
-FILES = main.c readfile.c parse.c parseop.c validargs.c
+FILES = main.c readfile.c parse.c parseop.c validargs.c free.c addcode.c
 
 OBJECTS = $(FILES:.c=.o)
 

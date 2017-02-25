@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 20:36:28 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/24 20:35:06 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,7 @@ void	parselabel(t_en *env, char *str)
 	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
 		showerr("label syntax error");
 	tmp = ft_strsub(str, 0, tmp - str);
-	// *tmp = '\0';
-	ft_printf("label = %s\n", tmp);
-	addcode(env, tmp, NULL);
+	addlabel(env, tmp);
 	ft_strdel(&tmp);
 }
 
@@ -103,7 +101,6 @@ void	parsesrc(t_en *env)
 	src = env->src;
 	while (src)
 	{
-		ft_printf("src = %s\n", src->line);
 		if (ft_strstr(src->line, NAME_CMD_STRING))
 			parsename(env, src->line);
 		else if (ft_strstr(src->line, COMMENT_CMD_STRING))

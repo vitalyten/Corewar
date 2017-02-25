@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 19:28:56 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/24 20:23:42 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ typedef char	t_arg_type; // ?
 
 typedef struct		s_code
 {
-	char			*op;
+	int				op;
+	char			**args;
 	char			*label;
 	struct s_code	*next;
 }					t_code;
@@ -148,19 +149,21 @@ void				showerr(char *msg); // main
 void				envinit(t_en *env);
 void				freesrc(t_en *env);
 void				parsesrc(t_en *env);
+void				writesrc(t_en *env);
 void				parsename(t_en *env, char *str);
 void				parsecomment(t_en *env, char *str);
 void				parselabel(t_en *env, char *str);
 void				parseop(t_en *env, char *str);
 char				*getop(char *str);
 char				*getargs(char *str);
-void				validargs(char **args, int op);
+void				validargs(t_en *env, char **args, int op);
 void				checkdir(char *arg, int i, int op);
 void				checkind(char *arg, int i, int op);
 void				checkreg(char *arg, int i, int op);
 int					islabel(char *str, int start, int end);
 void				trimstr(char **str); // main
-void				addcode(t_en *env, char *label, char *op); // main
+void				addlabel(t_en *env, char *label); // main
+void				addcode(t_en *env, int op, char **args); // main
 int					spllen(char **spl); // main
 char				*trimfree(char *s);
 char				*strdupfree(char *src, int start, int end);

@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 20:17:04 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/24 21:24:19 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ typedef struct		s_op
 	char	opcode;
 	int		ncycles;
 	char	*rep;
-	int		has_acb; // ?
+	int		acb;
 	int		is_index; // ?
 }					t_op;
 */
@@ -53,70 +53,6 @@ t_op    g_ops[17] =
 	{0, 0, {0}, 0, 0, 0, 0, 0}
 };
 
-char	*trimfree(char *s)
-{
-	size_t	start;
-	size_t	end;
-	char	*ret;
-
-	ret = NULL;
-	if (s)
-	{
-		start = 0;
-		end = ft_strlen(s);
-		while (ft_iswhitespace(s[start]))
-			start++;
-		while (ft_iswhitespace(s[end - 1]))
-			end--;
-		if (end < start)
-		{
-			ft_strdel(&s);
-			return (ft_strnew(0));
-		}
-		if (!(ret = ft_strnew(end - start)))
-			showerr("malloc error tf");
-		ret = ft_strncpy(ret, s + start, end - start);
-		ft_strdel(&s);
-	}
-	return (ret);
-}
-
-char	*strdupfree(char *src, int start, int end)
-{
-	char	*ret;
-	int		i;
-
-	if (!src)
-		return (NULL);
-	ft_printf("srcdf = %s start = %d end = %d\n", src, start, end);
-	if (!(ret = (char *)malloc(sizeof(char) * (end - start + 1))))
-		showerr("malloc error df");
-	i = 0;
-	while (start < end)
-		ret[i++] = src[start++];
-	ret[i] = '\0';
-	ft_strdel(&src);
-	return (ret);
-}
-
-// void	trimstr(char **str)
-// {
-// 	int len;
-
-// 	if (str && *str)
-// 	{
-// 		while (ft_iswhitespace(**str))
-// 			(*str)++;
-// 		len = ft_strlen(*str);
-// 		if (len > 0)
-// 		{
-// 			while (ft_iswhitespace((*str)[len - 1]))
-// 				len--;
-// 			(*str)[len] = '\0';
-// 		}
-// 	}
-// }
-
 void	showerr(char *msg)
 {
 	ft_printf("%s\n", msg);
@@ -138,46 +74,6 @@ void	envinit(t_en *env)
 	env->size = 0;
 }
 
-void	freesrc(t_en *env)
-{
-	t_src *src;
-	t_src *tmp;
-
-	src = env->src;
-	while (src)
-	{
-		tmp = src;
-		src = src->next;
-		ft_printf("line = %s\n", tmp->line);
-		ft_strdel(&(tmp->line));
-		free(tmp);
-	}
-}
-
-void	addcode(t_en *env, char *label, char *op)
-{
-	t_code *tmp;
-	t_code *code;
-
-	tmp = (t_code *)malloc(sizeof(t_code));
-	tmp->next = NULL;
-	tmp->op = NULL;
-	tmp->label = NULL;
-	if (label)
-		tmp->label = ft_strdup(label);
-	if (op)
-		tmp->op = ft_strdup(op);
-	if (env->code)
-	{
-		code = env->code;
-		while (code->next)
-			code = code->next;
-		code->next = tmp;
-	}
-	else
-		env->code = tmp;
-}
-
 int		spllen(char **spl)
 {
 	int i;
@@ -189,11 +85,60 @@ int		spllen(char **spl)
 	return (i);
 }
 
+void	printsrc(t_en *env)
+{
+	t_code	*code;
+	char	**args;
+	int		i;
+
+	ft_printf("%s\n", env->header->prog_name);
+	ft_printf("%s\n", env->header->comment);
+	code = env->code;
+	while (code)
+	{
+		if (code->label)
+			ft_printf("%s\n", code->label);
+		if (code->op != -1)
+		{
+			i = 0;
+			ft_printf("%s", g_ops[code->op].name);
+			args = code->args;
+			while (args[i])
+				ft_printf(" %s", args[i++]);
+			ft_printf("\n");
+		}
+		code = code->next;
+	}
+}
+
+char	*getcorname(t_en *env)
+{
+	char	*ret;
+	int		len;
+
+	len = ft_strlen(env->file);
+	if (!(ret = (char *)malloc(sizeof(char) * (len + 3))))
+		showerr("malloc error");
+	ft_strncpy(ret, env->file, len - 1);
+	ret[len - 1] = '\0';
+	ft_strcat(ret, "cor");
+	return (ret);
+}
+
+void	writesrc(t_en *env)
+{
+	char	*file;
+
+	file = getcorname(env);
+	printsrc(env);
+	ft_printf("%s\n", file);
+}
+
 int		main(int ac, char **av)
 {
 	t_en	env;
-	t_src	*tmp;
-	t_code	*code;
+	// t_src	*tmp;
+	// t_code	*code;
 	int		i;
 
 	envinit(&env);
@@ -206,20 +151,21 @@ int		main(int ac, char **av)
 		checkfile(&env);
 		readfile(&env);
 		parsesrc(&env);
+		writesrc(&env);
 	}
-	tmp = env.src;
-	while (tmp)
-	{
-		ft_printf("%-4d %s\n", tmp->i, tmp->line);
-		tmp = tmp->next;
-	}
-	code = env.code;
-	while (code)
-	{
-		if (code->label)
-			ft_printf("label = %s\n", code->label);
-		code = code->next;
-	}
+	// tmp = env.src;
+	// while (tmp)
+	// {
+	// 	ft_printf("%-4d %s\n", tmp->i, tmp->line);
+	// 	tmp = tmp->next;
+	// }
+	// code = env.code;
+	// while (code)
+	// {
+	// 	if (code->label)
+	// 		ft_printf("label = %s\n", code->label);
+	// 	code = code->next;
+	// }
 	freesrc(&env);
 	return (0);
 }

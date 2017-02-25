@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:23:22 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 21:40:12 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/24 20:35:22 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ char	*getop(char *str)
 		showerr("no arguments");
 	op = ft_strsub(str, 0, tmp - str);
 	op = trimfree(op);
-	ft_printf("op = %s\n", op);
 	return (op);
 }
 
@@ -63,22 +62,7 @@ void	parseop(t_en *env, char *str)
 		}
 		if (i == 16)
 			showerr("name syntax error");
-		validargs(args, i);
+		validargs(env, args, i);
 		env->size++;
 	}
 }
-
-/*
-srcdf =    l2:         ; start = 0 end = 15
-srcdf = 	sti r1,    %:live, 		%1		;something start = 0 end = 26
-srcdf =                  ; start = 0 end = 17
-==10959== Invalid read of size 1
-==10959==    at 0x100000E30: trimfree (main.c:69)
-==10959==    by 0x1000016BF: readfile (readfile.c:82)
-==10959==    by 0x1000012FB: main (main.c:207)
-==10959==  Address 0x100a8f55f is 1 bytes before a block of size 18 alloc'd
-==10959==    at 0x10000FA11: malloc (in /Volumes/Storage/goinfre/vtenigin/homebrew/Cellar/valgrind/3.12.0/lib/valgrind/vgpreload_memcheck-amd64-darwin.so)
-==10959==    by 0x100000F7C: strdupfree (main.c:92)
-==10959==    by 0x1000016B2: readfile (readfile.c:81)
-==10959==    by 0x1000012FB: main (main.c:207)
-*/

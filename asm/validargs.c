@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 20:09:57 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/24 20:20:58 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	checkdir(char *arg, int i, int op)
 		}
 }
 
-void	validargs(char **args, int op)
+void	validargs(t_en *env, char **args, int op)
 {
 	int i;
 
@@ -90,4 +90,5 @@ void	validargs(char **args, int op)
 			checkind(args[i], i, op);
 		i++;
 	}
+	addcode(env, op, args);
 }
