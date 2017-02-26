@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 21:24:19 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 18:49:33 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,8 @@ void	envinit(t_en *env)
 	env->file = NULL;
 	env->src = NULL;
 	env->code = NULL;
-	env->header->prog_name[0] = 0;
-	env->header->comment[0] = 0;
-	env->size = 0;
+	ft_bzero(env->header->prog_name, PROG_NAME_LENGTH);
+	ft_bzero(env->header->comment, COMMENT_LENGTH);
 }
 
 int		spllen(char **spl)
@@ -91,8 +90,9 @@ void	printsrc(t_en *env)
 	char	**args;
 	int		i;
 
-	ft_printf("%s\n", env->header->prog_name);
-	ft_printf("%s\n", env->header->comment);
+	ft_printf("name: %s\n", env->header->prog_name);
+	ft_printf("size = %d\n", env->header->prog_size);
+	ft_printf("comment: %s\n", env->header->comment);
 	code = env->code;
 	while (code)
 	{
@@ -125,6 +125,53 @@ char	*getcorname(t_en *env)
 	return (ret);
 }
 
+void	*revbytes(void *mem, size_t size)
+{
+	char	*ret;
+	size_t	i;
+	size_t	j;
+
+	if (!(ret = malloc(size)))
+		showerr("malloc error");
+	i = 0;
+	j = size - 1;
+	while (i < size)
+		ret[i++] = ((char *)mem)[j--];
+	return ((void *)ret);
+}
+
+void	fillblank(int fd, int size)
+{
+	while (size % 4)
+	{
+		write(fd, "\0", 1);
+		size++;
+	}
+}
+
+void	writeheader(t_en *env)
+{
+	void	*tmp;
+	size_t	size;
+
+	size = sizeof(env->header->magic);
+	tmp = revbytes(&env->header->magic, size);
+	write(env->fd, tmp, size);
+	fillblank(env->fd, size);
+	free(tmp);
+	size = sizeof(env->header->prog_name);
+	write(env->fd, env->header->prog_name, size);
+	fillblank(env->fd, size);
+	size = sizeof(env->header->prog_size);
+	tmp = revbytes(&env->header->prog_size, size);
+	write(env->fd, tmp, size);
+	fillblank(env->fd, size);
+	free(tmp);
+	size = sizeof(env->header->comment);
+	write(env->fd, env->header->comment, size);
+	fillblank(env->fd, size);
+}
+
 void	writesrc(t_en *env)
 {
 	char	*file;
@@ -132,6 +179,10 @@ void	writesrc(t_en *env)
 	file = getcorname(env);
 	printsrc(env);
 	ft_printf("%s\n", file);
+	if ((env->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+		showerr("failed to create file");
+	writeheader(env);
+	close(env->fd);
 }
 
 int		main(int ac, char **av)
@@ -153,6 +204,9 @@ int		main(int ac, char **av)
 		parsesrc(&env);
 		writesrc(&env);
 	}
+	ft_printf("sizeof int = %d\n", sizeof(int));
+	ft_printf("sizeof unsigned int = %d\n", sizeof(unsigned int));
+	ft_printf("sizeof long = %d\n", sizeof(long));
 	// tmp = env.src;
 	// while (tmp)
 	// {

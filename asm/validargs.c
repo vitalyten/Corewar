@@ -6,13 +6,13 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 20:20:58 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 17:30:35 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
 
-void	checkreg(char *arg, int i, int op)
+void	checkreg(t_en *env, char *arg, int i, int op)
 {
 	int r;
 
@@ -29,9 +29,10 @@ void	checkreg(char *arg, int i, int op)
 			showerr("arg syntax error");
 		arg++;
 	}
+	env->header->prog_size++;
 }
 
-void	checkind(char *arg, int i, int op)
+void	checkind(t_en *env, char *arg, int i, int op)
 {
 	if (!(T_IND & g_ops[op].args[i]))
 		showerr("wrong argument");
@@ -49,9 +50,10 @@ void	checkind(char *arg, int i, int op)
 				showerr("arg syntax error");
 			arg++;
 		}
+	env->header->prog_size += IND_SIZE;
 }
 
-void	checkdir(char *arg, int i, int op)
+void	checkdir(t_en *env, char *arg, int i, int op)
 {
 	if (!(T_DIR & g_ops[op].args[i]))
 		showerr("wrong argument");
@@ -69,6 +71,7 @@ void	checkdir(char *arg, int i, int op)
 				showerr("arg syntax error");
 			arg++;
 		}
+	env->header->prog_size += (g_ops[op].index) ? IND_SIZE : DIR_SIZE;
 }
 
 void	validargs(t_en *env, char **args, int op)
@@ -83,12 +86,13 @@ void	validargs(t_en *env, char **args, int op)
 	{
 		args[i] = trimfree(args[i]);
 		if (args[i][0] == 'r')
-			checkreg(args[i] + 1, i, op);
+			checkreg(env, args[i] + 1, i, op);
 		else if (args[i][0] == DIRECT_CHAR)
-			checkdir(args[i] + 1, i, op);
+			checkdir(env, args[i] + 1, i, op);
 		else
-			checkind(args[i], i, op);
+			checkind(env, args[i], i, op);
 		i++;
 	}
+	env->header->prog_size += (g_ops[op].acb) ? 2 : 1;
 	addcode(env, op, args);
 }

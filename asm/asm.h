@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 20:23:42 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 17:29:11 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,8 @@ typedef struct		s_en
 	t_src		*src;
 	t_code		*code;
 	char		*file;
-	int			size;
+	// int			size;
+	int			fd;
 }					t_en;
 
 typedef struct		s_op
@@ -108,7 +109,7 @@ typedef struct		s_op
 	int		ncycles;
 	char	*rep;
 	int		acb; // arguments coding byte
-	int		is_index; // ?
+	int		index; // ?
 }					t_op;
 
 extern t_op			g_ops[17];
@@ -157,9 +158,9 @@ void				parseop(t_en *env, char *str);
 char				*getop(char *str);
 char				*getargs(char *str);
 void				validargs(t_en *env, char **args, int op);
-void				checkdir(char *arg, int i, int op);
-void				checkind(char *arg, int i, int op);
-void				checkreg(char *arg, int i, int op);
+void				checkdir(t_en *env, char *arg, int i, int op);
+void				checkind(t_en *env, char *arg, int i, int op);
+void				checkreg(t_en *env, char *arg, int i, int op);
 int					islabel(char *str, int start, int end);
 void				trimstr(char **str); // main
 void				addlabel(t_en *env, char *label); // main

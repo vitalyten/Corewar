@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 20:35:06 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 15:15:27 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	parsename(t_en *env, char *str)
 	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
 		showerr("syntax error");
 	ft_strncpy(env->header->prog_name, tmp2 + 1, tmp1 - tmp2 - 1);
+	env->header->prog_name[tmp1 - tmp2 - 1] = '\0';
 }
 
 void	parsecomment(t_en *env, char *str)
@@ -79,6 +80,7 @@ void	parsecomment(t_en *env, char *str)
 	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
 		showerr("syntax error");
 	ft_strncpy(env->header->comment, tmp2 + 1, tmp1 - tmp2 - 1);
+	env->header->comment[tmp1 - tmp2 - 1] = '\0';
 }
 
 void	parselabel(t_en *env, char *str)

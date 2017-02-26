@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/05 19:59:55 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/23 20:21:36 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 15:09:18 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int		isempty(char *str, int start, int end)
 {
 	while (str[start] && start < end)
 	{
-		if (str[start] != ' ' && str[start] != '\t')
+		if (str[start] != ' ' && str[start] != '\t' && str[start] != ';')
 			return (0);
 		start++;
 	}
@@ -41,7 +41,7 @@ t_src	*srcalloc(char *str, int i)
 	if (!(src = (t_src *)malloc(sizeof(t_src))))
 		showerr("malloc error");
 	src->i = i;
-	src->line = str;
+	src->line = ft_strdup(str);
 	src->next = NULL;
 	return (src);
 }
@@ -65,7 +65,6 @@ void	readfile(t_en *env)
 {
 	int		fd;
 	int		i;
-	char	*str;
 	char	*ln;
 	char	*tmp;
 
@@ -74,14 +73,14 @@ void	readfile(t_en *env)
 		showerr("can't open file");
 	while (get_next_line(fd, &ln) > 0)
 	{
+		ln = trimfree(ln);
 		if (ln[0] != COMMENT_CHAR && !isempty(ln, 0, ft_strlen(ln)))
 		{
-			str = ft_strdup(ln);
-			if ((tmp = ft_strchr(str, ';')))
-				str = strdupfree(str, 0, tmp - str);
-			str = trimfree(str);
-			if (ft_strlen(str))
-				storeline(env, str, ++i);
+			if ((tmp = ft_strchr(ln, ';')))
+				ln = strdupfree(ln, 0, tmp - ln);
+			ln = trimfree(ln);
+			if (ft_strlen(ln))
+				storeline(env, ln, ++i);
 		}
 		ft_strdel(&ln);
 	}

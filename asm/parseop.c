@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:23:22 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 20:35:22 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/25 16:21:59 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,5 @@ void	parseop(t_en *env, char *str)
 		if (i == 16)
 			showerr("name syntax error");
 		validargs(env, args, i);
-		env->size++;
 	}
 }
