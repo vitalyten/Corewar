@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/26 15:46:19 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 17:08:56 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ typedef char	t_arg_type; // ?
 
 typedef struct		s_code
 {
+	int				i;
 	int				op;
 	char			**args;
 	char			*label;

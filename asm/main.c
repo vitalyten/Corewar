@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/26 16:46:34 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 20:30:03 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,11 +98,11 @@ void	printsrc(t_en *env)
 	while (code)
 	{
 		if (code->label)
-			ft_printf("%s\n", code->label);
+			ft_printf("i = %d %s\n", code->i, code->label);
 		if (code->op != -1)
 		{
 			i = 0;
-			ft_printf("%s", g_ops[code->op].name);
+			ft_printf("i = %d %s", code->i, g_ops[code->op].name);
 			args = code->args;
 			while (args[i])
 				ft_printf(" %s", args[i++]);
@@ -173,39 +173,119 @@ void	writeacb(t_en *env, char **args)
 	write(env->fd, &acb, sizeof(acb));
 }
 
-void	writedir(t_en *env, int op, char *arg)
+int		countbytes(t_code *code, int start, int end)
+{
+	int		ret;
+	char	**args;
+
+	ft_printf("line = %d start = %d end = %d\n", code->i, start, end);
+	ret = 0;
+	while (code && code->i != start)
+		code = code->next;
+	while (code && code->label)
+	{
+		ft_printf("\n\nline = %d\n", code->op);
+		code = code->next;
+	}
+	while (code && code->i < end)
+	{
+		ret++;
+		if (g_ops[code->op].acb)
+			ret++;
+		args = code->args;
+		while (*args)
+		{
+			ret++;
+			ret += (*args[0] != 'r') ? 1 : 0;
+			ret += (*args[0] == '%' && !g_ops[code->op].index) ? 2 : 0;
+			args++;
+		}
+		code = code->next;
+		while (code && code->label)
+			code = code->next;
+	}
+	return (ret);
+}
+
+void	writelabel(t_en *env, t_code *code, char *arg, int size)
+{
+	unsigned int	step;
+	short			sts;
+	t_code			*label;
+	int				bytes;
+
+	step = 0;
+	label = env->code;
+	while (label)
+	{
+		if (label->label && !ft_strcmp(arg, label->label))
+			break ;
+		label = label->next;
+	}
+	// ft_printf("label id = %d\n", label->i);
+	if (label->i < code->i)
+	{
+		bytes = countbytes(env->code, label->i, code->i);
+		step -= bytes;
+	}
+	else
+	{
+		bytes = countbytes(env->code, code->i, label->i);
+		step += bytes;
+	}
+	// ft_printf("li = %d line = %d step = %d bytes = %d\n",
+	// label->i, code->i, step, bytes);
+	if (size == 4)
+		write(env->fd, revbytes(&step, sizeof(step)), sizeof(step));
+	else
+	{
+		sts = (short)step;
+		write(env->fd, revbytes(&sts, sizeof(sts)), sizeof(sts));
+
+	}
+}
+
+void	writedir(t_en *env, t_code *code, char *arg)
 {
 	int		size;
-	int		ar;
+	unsigned int	ar;
+	short			ars;
 
-	size = (g_ops[op].index) ? IND_SIZE : DIR_SIZE;
+	size = (g_ops[code->op].index) ? IND_SIZE : DIR_SIZE;
 	if (arg[0] == ':')
-		writedirlabel();
+		writelabel(env, code, arg + 1, size);
 	else
 	{
 		ar = ft_atoi(arg);
-		write(env->fd, &ar, size);
+		ars = (short)ar;
+		if (size == 4)
+			write(env->fd, revbytes(&ar, sizeof(ar)), size);
+		else
+			write(env->fd, revbytes(&ars, sizeof(ars)), size);
+
 	}
 }
 
-void	writeind(t_en *env, char *arg)
+void	writeind(t_en *env, t_code *code, char *arg)
 {
-	int		ar;
+	short	ar;
 
 	if (arg[0] == ':')
-		writeindlabel();
+		writelabel(env, code, arg + 1, IND_SIZE);
 	else
 	{
-		ar = ft_atoi(arg);
-		write(env->fd, &ar, IND_SIZE);
+		ar = (short)ft_atoi(arg);
+		write(env->fd, revbytes(&ar, sizeof(ar)), IND_SIZE);
 	}
 }
 
-void	writeargs(t_en *env, int op, char **args)
+void	writeargs(t_en *env, t_code *code)
 {
 	int		i;
 	char	r;
+	char	**args;
 
+	args = code->args;
 	i = 0;
 	while (args[i])
 	{
@@ -215,9 +295,9 @@ void	writeargs(t_en *env, int op, char **args)
 			write(env->fd, &r, sizeof(r));
 		}
 		if (args[i][0] == '%')
-			writedir(env, op, args[i] + 1);
+			writedir(env, code, args[i] + 1);
 		if (args[i][0] == ':' || ft_isdigit(args[i][0]))
-			wirteind(env, args[i]);
+			writeind(env, code, args[i]);
 		i++;
 	}
 }
@@ -234,7 +314,7 @@ void	writecode(t_en *env)
 			write(env->fd, &g_ops[code->op].opcode, sizeof(g_ops[code->op].opcode));
 			if (g_ops[code->op].acb)
 				writeacb(env, code->args);
-			writeargs(env, code->op, code->args);
+			writeargs(env, code);
 		}
 		code = code->next;
 	}
@@ -289,7 +369,13 @@ void	listlabel(t_en *env, char *str)
 	{
 		label = env->label;
 		while (label->next)
+		{
+			if (!ft_strcmp(label->label, str))
+				showerr("duplicate label");
 			label = label->next;
+		}
+		if (!ft_strcmp(label->label, str))
+				showerr("duplicate label");
 		label->next = tmp;
 	}
 	else
@@ -344,6 +430,7 @@ int		main(int ac, char **av)
 		ft_printf("label = %s\n", label->label);
 		label = label->next;
 	}
+	ft_printf("size of short = %d\n", sizeof(short));
 	// tmp = env.src;
 	// while (tmp)
 	// {
