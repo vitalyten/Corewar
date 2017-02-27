@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/25 15:15:27 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 15:18:27 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,17 +83,20 @@ void	parsecomment(t_en *env, char *str)
 	env->header->comment[tmp1 - tmp2 - 1] = '\0';
 }
 
-void	parselabel(t_en *env, char *str)
-{
-	char	*tmp;
+// void	parselabel(t_en *env, char *str)
+// {
+// 	char	*tmp;
 
-	tmp = ft_strchr(str, LABEL_CHAR);
-	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
-		showerr("label syntax error");
-	tmp = ft_strsub(str, 0, tmp - str);
-	addlabel(env, tmp);
-	ft_strdel(&tmp);
-}
+// 	tmp = ft_strchr(str, LABEL_CHAR);
+// 	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
+// 		showerr("label syntax error");
+// }
+
+// int		test1(char *tmp, char *line)
+// {
+// 	ft_printf("tmp = %s line = %s tmp - lie = %d\n", tmp, line, tmp - line);
+// 	return (tmp - line);
+// }
 
 void	parsesrc(t_en *env)
 {
@@ -107,9 +110,14 @@ void	parsesrc(t_en *env)
 			parsename(env, src->line);
 		else if (ft_strstr(src->line, COMMENT_CMD_STRING))
 			parsecomment(env, src->line);
-		else if ((tmp = ft_strchr(src->line, LABEL_CHAR))
-			&& islabel(src->line, 0, tmp - src->line))
-			parselabel(env, src->line);
+		else if ((tmp = ft_strchr(src->line, LABEL_CHAR)) &&
+			islabel(src->line, 0, tmp - src->line))
+		{
+			tmp = ft_strsub(src->line, 0, tmp - src->line);
+			addlabel(env, tmp);
+			ft_strdel(&tmp);
+
+		}
 		else
 			parseop(env, src->line);
 		src = src->next;

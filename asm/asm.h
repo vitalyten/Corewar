@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/30 18:15:08 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/25 17:29:11 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 15:46:19 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,12 @@ typedef struct		s_code
 	struct s_code	*next;
 }					t_code;
 
+typedef struct		s_label
+{
+	char			*label;
+	struct s_label	*next;
+}					t_label;
+
 typedef struct		s_src
 {
 	int				i;
@@ -95,6 +101,7 @@ typedef struct		s_en
 	t_header	*header;
 	t_src		*src;
 	t_code		*code;
+	t_label		*label;
 	char		*file;
 	// int			size;
 	int			fd;
@@ -105,7 +112,7 @@ typedef struct		s_op
 	char	*name;
 	int		nargs;
 	int		args[MAX_ARGS_NUMBER];
-	int		opcode;
+	char	opcode;
 	int		ncycles;
 	char	*rep;
 	int		acb; // arguments coding byte
@@ -153,7 +160,7 @@ void				parsesrc(t_en *env);
 void				writesrc(t_en *env);
 void				parsename(t_en *env, char *str);
 void				parsecomment(t_en *env, char *str);
-void				parselabel(t_en *env, char *str);
+// void				parselabel(t_en *env, char *str);
 void				parseop(t_en *env, char *str);
 char				*getop(char *str);
 char				*getargs(char *str);

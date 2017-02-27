@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/25 18:49:33 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 16:46:34 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	envinit(t_en *env)
 	env->file = NULL;
 	env->src = NULL;
 	env->code = NULL;
+	env->label = NULL;
 	ft_bzero(env->header->prog_name, PROG_NAME_LENGTH);
 	ft_bzero(env->header->comment, COMMENT_LENGTH);
 }
@@ -149,6 +150,96 @@ void	fillblank(int fd, int size)
 	}
 }
 
+void	writeacb(t_en *env, char **args)
+{
+	char	acb;
+	int		i;
+
+	i = 0;
+	acb = 0;
+	while (args[i])
+	{
+		if (args[i][0] == 'r')
+			acb |= REG_CODE;
+		if (args[i][0] == '%')
+			acb |= DIR_CODE;
+		if (args[i][0] == ':' || ft_isdigit(args[i][0]))
+			acb |= IND_CODE;
+		acb <<= 2;
+		i++;
+	}
+	while (i++ < 3)
+		acb <<= 2;
+	write(env->fd, &acb, sizeof(acb));
+}
+
+void	writedir(t_en *env, int op, char *arg)
+{
+	int		size;
+	int		ar;
+
+	size = (g_ops[op].index) ? IND_SIZE : DIR_SIZE;
+	if (arg[0] == ':')
+		writedirlabel();
+	else
+	{
+		ar = ft_atoi(arg);
+		write(env->fd, &ar, size);
+	}
+}
+
+void	writeind(t_en *env, char *arg)
+{
+	int		ar;
+
+	if (arg[0] == ':')
+		writeindlabel();
+	else
+	{
+		ar = ft_atoi(arg);
+		write(env->fd, &ar, IND_SIZE);
+	}
+}
+
+void	writeargs(t_en *env, int op, char **args)
+{
+	int		i;
+	char	r;
+
+	i = 0;
+	while (args[i])
+	{
+		if (args[i][0] == 'r')
+		{
+			r = ((char)ft_atoi(args[i] + 1));
+			write(env->fd, &r, sizeof(r));
+		}
+		if (args[i][0] == '%')
+			writedir(env, op, args[i] + 1);
+		if (args[i][0] == ':' || ft_isdigit(args[i][0]))
+			wirteind(env, args[i]);
+		i++;
+	}
+}
+
+void	writecode(t_en *env)
+{
+	t_code	*code;
+
+	code = env->code;
+	while (code)
+	{
+		if (code->op != -1)
+		{
+			write(env->fd, &g_ops[code->op].opcode, sizeof(g_ops[code->op].opcode));
+			if (g_ops[code->op].acb)
+				writeacb(env, code->args);
+			writeargs(env, code->op, code->args);
+		}
+		code = code->next;
+	}
+}
+
 void	writeheader(t_en *env)
 {
 	void	*tmp;
@@ -182,7 +273,48 @@ void	writesrc(t_en *env)
 	if ((env->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 		showerr("failed to create file");
 	writeheader(env);
+	writecode(env);
 	close(env->fd);
+}
+
+void	listlabel(t_en *env, char *str)
+{
+	t_label *tmp;
+	t_label *label;
+
+	tmp = (t_label *)malloc(sizeof(t_label));
+	tmp->next = NULL;
+	tmp->label = ft_strdup(str);
+	if (env->label)
+	{
+		label = env->label;
+		while (label->next)
+			label = label->next;
+		label->next = tmp;
+	}
+	else
+		env->label = tmp;
+}
+
+void	storelabel(t_en *env)
+{
+	t_src	*src;
+	char	*tmp;
+
+	src = env->src;
+	while (src)
+	{
+		if ((tmp = ft_strchr(src->line, LABEL_CHAR)) &&
+			islabel(src->line, 0, tmp - src->line))
+		{
+			if (!isempty(src->line, tmp - src->line + 1, ft_strlen(src->line)))
+				showerr("label syntax error");
+			tmp = ft_strsub(src->line, 0, tmp - src->line);
+			listlabel(env, tmp);
+			ft_strdel(&tmp);
+		}
+		src = src->next;
+	}
 }
 
 int		main(int ac, char **av)
@@ -190,6 +322,7 @@ int		main(int ac, char **av)
 	t_en	env;
 	// t_src	*tmp;
 	// t_code	*code;
+	t_label	*label;
 	int		i;
 
 	envinit(&env);
@@ -201,12 +334,16 @@ int		main(int ac, char **av)
 		env.file = av[i];
 		checkfile(&env);
 		readfile(&env);
+		storelabel(&env);
 		parsesrc(&env);
 		writesrc(&env);
 	}
-	ft_printf("sizeof int = %d\n", sizeof(int));
-	ft_printf("sizeof unsigned int = %d\n", sizeof(unsigned int));
-	ft_printf("sizeof long = %d\n", sizeof(long));
+	label = env.label;
+	while (label)
+	{
+		ft_printf("label = %s\n", label->label);
+		label = label->next;
+	}
 	// tmp = env.src;
 	// while (tmp)
 	// {

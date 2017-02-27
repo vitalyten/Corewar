@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/25 17:30:35 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/02/26 15:37:37 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,17 @@ void	checkreg(t_en *env, char *arg, int i, int op)
 	env->header->prog_size++;
 }
 
+void	validlabel(t_label *label, char *str)
+{
+	while (label)
+	{
+		if (!ft_strcmp(label->label, str))
+			return ;
+		label = label->next;
+	}
+	showerr("nonexistent label argument");
+}
+
 void	checkind(t_en *env, char *arg, int i, int op)
 {
 	if (!(T_IND & g_ops[op].args[i]))
@@ -42,6 +53,7 @@ void	checkind(t_en *env, char *arg, int i, int op)
 	{
 		if (!islabel(arg, 1, ft_strlen(arg)))
 			showerr("invalid label");
+		validlabel(env->label, arg + 1);
 	}
 	else
 		while (*arg)
@@ -63,6 +75,7 @@ void	checkdir(t_en *env, char *arg, int i, int op)
 	{
 		if (!islabel(arg, 1, ft_strlen(arg)))
 			showerr("invalid label");
+		validlabel(env->label, arg + 1);
 	}
 	else
 		while (*arg)
