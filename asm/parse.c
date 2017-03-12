@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/26 15:18:27 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/11 20:24:06 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ void	parsename(t_en *env, char *str)
 		showerr("name missing");
 	if (tmp1 - tmp2 - 1 > PROG_NAME_LENGTH)
 		showerr("name too long");
-	if (!islabel(str, finish + 1, tmp1 - str)) // reformat name
-		showerr("wrong name format");
+	// if (!islabel(str, finish + 1, tmp1 - str)) // reformat name
+	// 	showerr("wrong name format");
 	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
 		showerr("syntax error");
 	ft_strncpy(env->header->prog_name, tmp2 + 1, tmp1 - tmp2 - 1);

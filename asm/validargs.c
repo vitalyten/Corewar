@@ -6,11 +6,24 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/26 15:37:37 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/11 19:45:13 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
+
+int		ft_isnumber(char *num)
+{
+	if (*num == '-')
+		num++;
+	while (*num)
+	{
+		if (*num < '0' || *num > '9')
+			return (0);
+		num++;
+	}
+	return (1);
+}
 
 void	checkreg(t_en *env, char *arg, int i, int op)
 {
@@ -19,14 +32,14 @@ void	checkreg(t_en *env, char *arg, int i, int op)
 	if (!(T_REG & g_ops[op].args[i]))
 		showerr("wrong argument");
 	if (!*arg)
-		showerr("arg syntax error");
+		showerr("arg syntax error no arg");
 	r = ft_atoi(arg);
 	if (r > REG_NUMBER || r < 1)
 		showerr("wrong registry number");
 	while (*arg)
 	{
-		if (!ft_isdigit(*arg))
-			showerr("arg syntax error");
+		if (!ft_isnumber(arg))
+			showerr("arg syntax error not a number reg");
 		arg++;
 	}
 	env->header->prog_size++;
@@ -48,7 +61,7 @@ void	checkind(t_en *env, char *arg, int i, int op)
 	if (!(T_IND & g_ops[op].args[i]))
 		showerr("wrong argument");
 	if (ft_strlen(arg) < 1)
-		showerr("arg syntax error");
+		showerr("arg syntax error too short ind");
 	if (arg[0] == LABEL_CHAR)
 	{
 		if (!islabel(arg, 1, ft_strlen(arg)))
@@ -58,8 +71,8 @@ void	checkind(t_en *env, char *arg, int i, int op)
 	else
 		while (*arg)
 		{
-			if (!ft_isdigit(*arg))
-				showerr("arg syntax error");
+			if (!ft_isnumber(arg))
+				showerr("arg syntax error not a number ind");
 			arg++;
 		}
 	env->header->prog_size += IND_SIZE;
@@ -70,7 +83,7 @@ void	checkdir(t_en *env, char *arg, int i, int op)
 	if (!(T_DIR & g_ops[op].args[i]))
 		showerr("wrong argument");
 	if (ft_strlen(arg) < 1)
-		showerr("arg syntax error");
+		showerr("arg syntax error too short dir");
 	if (arg[0] == LABEL_CHAR)
 	{
 		if (!islabel(arg, 1, ft_strlen(arg)))
@@ -80,8 +93,11 @@ void	checkdir(t_en *env, char *arg, int i, int op)
 	else
 		while (*arg)
 		{
-			if (!ft_isdigit(*arg))
-				showerr("arg syntax error");
+			if (!ft_isnumber(arg))
+			{
+				ft_printf("%s\n", arg);
+				showerr("arg syntax error not a number dir");
+			}
 			arg++;
 		}
 	env->header->prog_size += (g_ops[op].index) ? IND_SIZE : DIR_SIZE;

@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:23:22 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/25 16:21:59 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/11 19:33:06 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,11 @@ char	*getop(char *str)
 	char	*op;
 
 	op = NULL;
-	if (!(tmp = ft_strchr(str, ' ')))
-		tmp = ft_strchr(str, '\t');
-	if (!tmp)
-		showerr("no arguments");
+	tmp = str;
+	while (*tmp && (*tmp != ' ' && *tmp != '\t'))
+		tmp++;
+	// if (!tmp)
+		// showerr("no arguments");
 	op = ft_strsub(str, 0, tmp - str);
 	op = trimfree(op);
 	return (op);
@@ -60,8 +61,10 @@ void	parseop(t_en *env, char *str)
 				break ;
 			i++;
 		}
+		ft_printf("%s\n", op);
 		if (i == 16)
-			showerr("name syntax error");
+			showerr("op name syntax error");
+		ft_strdel(&op);
 		validargs(env, args, i);
 	}
 }

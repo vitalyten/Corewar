@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/24 20:24:24 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/02/24 20:34:30 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/11 18:39:49 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +58,48 @@ char	*strdupfree(char *src, int start, int end)
 	return (ret);
 }
 
+void	freeargs(char **args)
+{
+	int		i;
+
+	i = -1;
+	while (args[++i])
+		ft_strdel(&args[i]);
+	free(args);
+}
+
+void	freelabel(t_label *label)
+{
+	t_label	*tmp;
+
+	while (label)
+	{
+		tmp = label;
+		label = label->next;
+		ft_strdel(&(tmp->label));
+		free(tmp);
+	}
+}
+
 void	freesrc(t_en *env)
 {
-	t_src *src;
-	t_src *tmp;
+	t_src	*src;
+	t_src	*tmp;
+	t_code	*code;
+	t_code	*tmpc;
 
+	freelabel(env->label);
+	code = env->code;
+	while (code)
+	{
+		if (code->args)
+			freeargs(code->args);
+		tmpc = code;
+		code = code->next;
+		if (tmpc->label)
+			ft_strdel(&(tmpc->label));
+		free(tmpc);
+	}
 	src = env->src;
 	while (src)
 	{
