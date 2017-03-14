@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/11 17:06:41 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 18:57:32 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 21:56:36 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,6 @@ void	writesrc(t_en *env)
 	char	*file;
 
 	file = getcorname(env);
-	// printsrc(env);
-	// ft_printf("%s\n", file);
 	if ((env->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 		showerr("failed to create file");
 	writeheader(env);

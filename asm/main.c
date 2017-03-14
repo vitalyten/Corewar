@@ -6,11 +6,24 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/01 19:03:42 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 19:15:36 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 21:52:19 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
+
+int		ft_isnumber(char *num)
+{
+	if (*num == '-')
+		num++;
+	while (*num)
+	{
+		if (*num < '0' || *num > '9')
+			return (0);
+		num++;
+	}
+	return (1);
+}
 
 void	showerr(char *msg)
 {
@@ -44,39 +57,9 @@ int		spllen(char **spl)
 	return (i);
 }
 
-// void	printsrc(t_en *env)
-// {
-// 	t_code	*code;
-// 	char	**args;
-// 	int		i;
-
-// 	ft_printf("name: %s\n", env->header->prog_name);
-// 	ft_printf("size = %d\n", env->header->prog_size);
-// 	ft_printf("comment: %s\n", env->header->comment);
-// 	code = env->code;
-// 	while (code)
-// 	{
-// 		if (code->label)
-// 			ft_printf("i = %d %s\n", code->i, code->label);
-// 		if (code->op != -1)
-// 		{
-// 			i = 0;
-// 			ft_printf("i = %d %s", code->i, g_ops[code->op].name);
-// 			args = code->args;
-// 			while (args[i])
-// 				ft_printf(" %s", args[i++]);
-// 			ft_printf("\n");
-// 		}
-// 		code = code->next;
-// 	}
-// }
-
 int		main(int ac, char **av)
 {
 	t_en	env;
-	// t_src	*tmp;
-	// t_code	*code;
-	t_label	*label;
 	int		i;
 
 	envinit(&env);
@@ -92,26 +75,6 @@ int		main(int ac, char **av)
 		parsesrc(&env);
 		writesrc(&env);
 	}
-	label = env.label;
-	// while (label)
-	// {
-	// 	ft_printf("label = %s\n", label->label);
-	// 	label = label->next;
-	// }
-	// ft_printf("size of short = %d\n", sizeof(short));
-	// tmp = env.src;
-	// while (tmp)
-	// {
-	// 	ft_printf("%-4d %s\n", tmp->i, tmp->line);
-	// 	tmp = tmp->next;
-	// }
-	// code = env.code;
-	// while (code)
-	// {
-	// 	if (code->label)
-	// 		ft_printf("label = %s\n", code->label);
-	// 	code = code->next;
-	// }
 	freesrc(&env);
 	free(env.header);
 	return (0);

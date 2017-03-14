@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/11 17:22:44 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 20:34:25 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 22:12:55 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	listlabel(t_en *env, char *str)
 			label = label->next;
 		}
 		if (!ft_strcmp(label->label, str))
-				showerr("duplicate label");
+			showerr("duplicate label");
 		label->next = tmp;
 	}
 	else
@@ -48,7 +48,6 @@ void	storelabel(t_en *env)
 		if ((tmp = ft_strchr(src->line, LABEL_CHAR)) &&
 			islabel(src->line, 0, tmp - src->line))
 		{
-			ft_printf("%s\n", src->line);
 			if (!isempty(src->line, tmp - src->line + 1, ft_strlen(src->line)))
 				showerr("label syntax error storelabel");
 			tmp = ft_strsub(src->line, 0, tmp - src->line);

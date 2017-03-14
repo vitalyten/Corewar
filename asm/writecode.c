@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/11 17:14:17 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 20:00:24 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 21:57:12 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,8 @@ void	writecode(t_en *env)
 	{
 		if (code->op != -1)
 		{
-			write(env->fd, &g_ops[code->op].opcode, sizeof(g_ops[code->op].opcode));
+			write(env->fd, &g_ops[code->op].opcode,
+				sizeof(g_ops[code->op].opcode));
 			if (g_ops[code->op].acb)
 				writeacb(env, code->args);
 			writeargs(env, code);

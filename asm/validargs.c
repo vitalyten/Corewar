@@ -6,24 +6,11 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/16 22:26:23 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 19:45:13 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 22:11:49 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "asm.h"
-
-int		ft_isnumber(char *num)
-{
-	if (*num == '-')
-		num++;
-	while (*num)
-	{
-		if (*num < '0' || *num > '9')
-			return (0);
-		num++;
-	}
-	return (1);
-}
 
 void	checkreg(t_en *env, char *arg, int i, int op)
 {
@@ -94,10 +81,7 @@ void	checkdir(t_en *env, char *arg, int i, int op)
 		while (*arg)
 		{
 			if (!ft_isnumber(arg))
-			{
-				ft_printf("%s\n", arg);
 				showerr("arg syntax error not a number dir");
-			}
 			arg++;
 		}
 	env->header->prog_size += (g_ops[op].index) ? IND_SIZE : DIR_SIZE;

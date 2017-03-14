@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/13 20:21:19 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/11 20:24:06 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/13 22:01:03 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,6 @@ void	parsename(t_en *env, char *str)
 		showerr("name missing");
 	if (tmp1 - tmp2 - 1 > PROG_NAME_LENGTH)
 		showerr("name too long");
-	// if (!islabel(str, finish + 1, tmp1 - str)) // reformat name
-	// 	showerr("wrong name format");
 	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
 		showerr("syntax error");
 	ft_strncpy(env->header->prog_name, tmp2 + 1, tmp1 - tmp2 - 1);
@@ -75,28 +73,11 @@ void	parsecomment(t_en *env, char *str)
 		showerr("comment missing");
 	if (tmp1 - tmp2 - 1 > COMMENT_LENGTH)
 		showerr("comment too long");
-	// if (!islabel(str, finish + 1, tmp1 - str)) // check comment format
-	// 	showerr("wrong name format");
 	if (!isempty(str, tmp1 - str + 1, ft_strlen(str)))
 		showerr("syntax error");
 	ft_strncpy(env->header->comment, tmp2 + 1, tmp1 - tmp2 - 1);
 	env->header->comment[tmp1 - tmp2 - 1] = '\0';
 }
-
-// void	parselabel(t_en *env, char *str)
-// {
-// 	char	*tmp;
-
-// 	tmp = ft_strchr(str, LABEL_CHAR);
-// 	if (!isempty(str, tmp - str + 1, ft_strlen(str)))
-// 		showerr("label syntax error");
-// }
-
-// int		test1(char *tmp, char *line)
-// {
-// 	ft_printf("tmp = %s line = %s tmp - lie = %d\n", tmp, line, tmp - line);
-// 	return (tmp - line);
-// }
 
 void	parsesrc(t_en *env)
 {
@@ -116,7 +97,6 @@ void	parsesrc(t_en *env)
 			tmp = ft_strsub(src->line, 0, tmp - src->line);
 			addlabel(env, tmp);
 			ft_strdel(&tmp);
-
 		}
 		else
 			parseop(env, src->line);
