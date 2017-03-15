@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 22:55:15 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/13 22:58:11 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/15 00:09:31 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,16 +56,6 @@ typedef struct		s_header
 	char			comment[COMMENT_LENGTH + 1];
 }					t_header;
 
-typedef struct		s_en
-{
-	// t_header	*header;
-	// t_src		*src;
-	// t_code		*code;
-	// t_label		*label;
-	// char		*file;
-	// int			fd;
-}					t_en;
-
 typedef struct		s_op
 {
 	char	*name;
@@ -77,6 +67,31 @@ typedef struct		s_op
 	int		acb;
 	int		index;
 }					t_op;
+
+typedef struct		s_champ
+{
+	char			*name;
+	char			*comment;
+	char			*code;
+	unsigned char	color;
+	unsigned int	size;
+	unsigned int	pos;
+	struct s_champ	*next;
+}					t_champ;
+
+typedef struct		s_en
+{
+	// t_header	*header;
+	// t_src		*src;
+	// t_code		*code;
+	// t_label		*label;
+	int				champnb;
+	unsigned char	memory[MEM_SIZE];
+	unsigned char	color[MEM_SIZE];
+	t_champ			*champ;
+	int				fd;
+}					t_en;
+
 
 extern t_op			g_ops[17];
 
