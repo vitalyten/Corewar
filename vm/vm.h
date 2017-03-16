@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 22:55:15 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/15 00:09:31 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/15 22:43:04 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,14 +70,23 @@ typedef struct		s_op
 
 typedef struct		s_champ
 {
+	int				id;
 	char			*name;
 	char			*comment;
 	char			*code;
-	unsigned char	color;
-	unsigned int	size;
-	unsigned int	pos;
+	int				color;
+	int				size;
+	int				alive;
+	int				pos;
 	struct s_champ	*next;
 }					t_champ;
+
+typedef struct		s_proc
+{
+	int				id;
+	int				pos;
+	struct s_proc	*next;
+}					t_proc;
 
 typedef struct		s_en
 {
