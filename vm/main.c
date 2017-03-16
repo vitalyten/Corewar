@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 21:47:53 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/15 22:42:06 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/16 16:42:02 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,10 +147,43 @@ void	envinit(t_en *env)
 	ft_bzero(env->color, MEM_SIZE);
 }
 
+t_proc	*procinit(t_champ *champ)
+{
+	t_proc	*proc;
+
+	proc = (t_proc *)malloc(sizeof(t_proc));
+	// proc->id = champ->id;
+	proc->pc = champ->pos;
+	proc->color = champ->color;
+	proc->carry = 0;
+	proc->cycles = 0;
+	proc->op = 0;
+	proc->acb = 0;
+	ft_bzero(proc->args, sizeof(int) * MAX_ARGS_NUMBER);
+	ft_bzero(proc->reg, sizeof(int) * REG_NUMBER);
+	proc->next = NULL;
+	return (proc);
+}
+
+void	launchproc(t_en *env)
+{
+	t_champ	*champ;
+	t_proc	*proc;
+
+	champ = env->champ;
+	while (champ)
+	{
+		proc = procinit(champ);
+		proc->next = env->proc;
+		env->proc = proc;
+		champ = champ->next;
+	}
+}
+
 int		main(int ac, char **av)
 {
 	t_en	env;
-	t_champ *champ;
+	t_proc *champ;
 	int		i;
 
 	envinit(&env);
@@ -160,12 +193,13 @@ int		main(int ac, char **av)
 	while (av[++i])
 		readchamp(&env, av[i]);
 	writechamp(&env);
+	launchproc(&env);
 	printmemory(&env);
-	champ = env.champ;
-	// while (champ)
-	// {
-	// 	ft_printf("\e[31m%s\n%s\e[0m\n\n", champ->name, champ->comment);
-	// 	champ = champ->next;
-	// }
+	champ = env.proc;
+	while (champ)
+	{
+		ft_printf("%d\n", champ->color);
+		champ = champ->next;
+	}
 }
 
