@@ -6,26 +6,13 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 21:47:53 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/16 16:42:02 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/16 22:41:14 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vm.h"
 
-void	*revbytes(void *mem, size_t size)
-{
-	char	*ret;
-	size_t	i;
-	size_t	j;
 
-	if (!(ret = malloc(size)))
-		showerr("malloc error");
-	i = 0;
-	j = size - 1;
-	while (i < size)
-		ret[i++] = ((char *)mem)[j--];
-	return ((void *)ret);
-}
 
 void	showerr(char *msg)
 {
@@ -33,16 +20,7 @@ void	showerr(char *msg)
 	exit(EXIT_FAILURE);
 }
 
-void	checkmagic(t_en *env)
-{
-	unsigned int	*m;
-	unsigned int	magic;
 
-	read(env->fd, &magic, sizeof(COREWAR_EXEC_MAGIC));
-	m = (unsigned int *)revbytes(&magic, sizeof(COREWAR_EXEC_MAGIC));
-	if (*m != COREWAR_EXEC_MAGIC)
-		showerr("wrong file magic");
-}
 
 void	writechamp(t_en *env)
 {
@@ -57,14 +35,13 @@ void	writechamp(t_en *env)
 		j = -1;
 		ft_printf("%s\n", champ->name);
 		ft_printf("size = %d\n", champ->size);
-		ft_printf("i = %d\n", i);
-		// champ->pos = i;
+		ft_printf("pos = %d\n", i);
+		champ->pos = i;
 		while (++j < champ->size)
 		{
 			env->memory[i + j] = champ->code[j];
 			env->color[i + j] = champ->color;
 		}
-		ft_printf("i = %d\n", i);
 		i += MEM_SIZE / env->champnb;
 		champ = champ->next;
 	}
@@ -84,60 +61,9 @@ void	printmemory(t_en *env)
 	}
 }
 
-t_champ	*champinit()
-{
-	t_champ *champ;
 
-	champ = (t_champ *)malloc(sizeof(t_champ));
-	champ->next = NULL;
-	champ->alive = 1;
-	champ->color = 31;
-	champ->name = (char *)malloc(sizeof(char) * (PROG_NAME_LENGTH + 4));
-	champ->comment = (char *)malloc(sizeof(char) * (COMMENT_LENGTH + 4));
-	champ->code = (char *)malloc(sizeof(char) * CHAMP_MAX_SIZE);
-	return (champ);
-}
 
-void	readchamp(t_en *env, char *file)
-{
-	t_champ			*champ;
-	t_champ			*tmp;
-	unsigned int	size;
-	unsigned int	*s;
 
-	champ = champinit();
-	if ((env->fd = open(file, O_RDONLY)) == -1)
-		showerr("couldn't open file");
-	checkmagic(env);
-	read(env->fd, champ->name, PROG_NAME_LENGTH + 4);
-	read(env->fd, &size, sizeof(int));
-	s = (unsigned int *)revbytes(&size, sizeof(int));
-	if ((champ->size = *s) > CHAMP_MAX_SIZE)
-		showerr("champion is too big");
-	free(s);
-	read(env->fd, champ->comment, COMMENT_LENGTH + 4);
-	read(env->fd, champ->code, champ->size);
-	if (++env->champnb > 4)
-		showerr("4 champions max");
-	if (!env->champ)
-		env->champ = champ;
-	else
-	{
-		champ->color++;
-		tmp = env->champ;
-		while (tmp->next)
-		{
-			champ->color++;
-			tmp = tmp->next;
-		}
-		tmp->next = champ;
-	}
-	// ft_printf("%d\n", champ->size);
-	// ft_printf("%s\n", champ->name);
-	// ft_printf("%s\n", champ->comment);
-	// ft_printf("%c\n", champ->code[1]);
-
-}
 
 void	envinit(t_en *env)
 {
@@ -165,7 +91,17 @@ t_proc	*procinit(t_champ *champ)
 	return (proc);
 }
 
-void	launchproc(t_en *env)
+void	procreinit(t_proc *proc)
+{
+	proc->carry = 0;
+	proc->cycles = 0;
+	proc->op = 0;
+	proc->acb = 0;
+	ft_bzero(proc->args, sizeof(int) * MAX_ARGS_NUMBER);
+	ft_bzero(proc->reg, sizeof(int) * REG_NUMBER);
+}
+
+void	makeproc(t_en *env)
 {
 	t_champ	*champ;
 	t_proc	*proc;
@@ -177,6 +113,99 @@ void	launchproc(t_en *env)
 		proc->next = env->proc;
 		env->proc = proc;
 		champ = champ->next;
+	}
+}
+
+int		getdir(t_en *env, t_proc *proc)
+{
+	int	ar;
+	int	i;
+
+	ar = 0;
+	i = -1;
+	while (++i < 4)
+	{
+		ar |= env->memory[proc->pc++];
+		if(i < 3)
+			ar <<= 8;
+	}
+	return (ar);
+}
+
+int		getind(t_en *env, t_proc *proc)
+{
+	int	ar;
+	int	i;
+
+	ar = 0;
+	i = -1;
+	while (++i < 2)
+	{
+		ar |= env->memory[proc->pc++];
+		if (i == 0)
+			ar <<= 8;
+		// ft_printf("ar = %x\n", ar);
+	}
+
+	return (ar);
+}
+
+int		validacb(t_en *env, t_proc *proc)
+{
+	char	arc[3];
+	int		i;
+
+	i = -1;
+	arc[0] = (proc->acb & 0xC0) >> 6;
+	arc[1] = (proc->acb & 0x30) >> 4;
+	arc[2] = (proc->acb & 0xC) >> 2;
+	while (++i < g_ops[proc->op - 1].nargs)
+	{
+		if (arc[i] == IND_CODE)
+			arc[i] = T_IND;
+		if ((arc[i] & g_ops[proc->op - 1].args[i]) != arc[i])
+			return (0);
+		if (arc[i] == T_REG)
+			proc->args[i] = env->memory[proc->pc++];
+		else if (arc[i] == T_DIR && !g_ops[proc->op - 1].index)
+			proc->args[i] = getdir(env, proc);
+		else
+			proc->args[i] = getind(env, proc);
+
+	}
+	// ft_printf("\nop = %d \nt_ar0 = %d t_ar1 = %d t_ar2 = %d\n",
+		// proc->op, arc[0], arc[1], arc[2]);
+	return (1);
+}
+
+void	launchproc(t_en *env)
+{
+	t_proc	*proc;
+	// int		*ar;
+
+	proc = env->proc;
+	while (proc)
+	{
+		proc->op = env->memory[proc->pc++];
+		if (proc->op > 0 && proc->op < 17)
+		{
+			if (g_ops[proc->op - 1].acb)
+			{
+				proc->acb = env->memory[proc->pc++];
+				if (validacb(env, proc))
+					ft_printf("valid acb\n");
+				else
+					ft_printf("invalid acb\n");
+			}
+			else if (g_ops[proc->op - 1].index)
+				proc->args[0] = getind(env, proc);
+			else
+				proc->args[0] = getdir(env, proc);
+		}
+		ft_printf("arg0 = %d arg1 = %d arg2 = %d\n",
+			proc->args[0], proc->args[1], proc->args[2]);
+		ft_printf("op == %d acb == %x\n", proc->op, proc->acb);
+		proc = proc->next;
 	}
 }
 
@@ -193,13 +222,14 @@ int		main(int ac, char **av)
 	while (av[++i])
 		readchamp(&env, av[i]);
 	writechamp(&env);
-	launchproc(&env);
+	makeproc(&env);
 	printmemory(&env);
+	launchproc(&env);
 	champ = env.proc;
-	while (champ)
-	{
-		ft_printf("%d\n", champ->color);
-		champ = champ->next;
-	}
+	// while (champ)
+	// {
+	// 	ft_printf("%d\n", champ->color);
+	// 	champ = champ->next;
+	// }
 }
 

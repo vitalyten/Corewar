@@ -6,13 +6,13 @@
 #    By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/03/13 22:35:15 by vtenigin          #+#    #+#              #
-#    Updated: 2017/03/13 22:36:12 by vtenigin         ###   ########.fr        #
+#    Updated: 2017/03/16 22:41:36 by vtenigin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = corewar
 
-FILES = main.c
+FILES = main.c op.c readchamp.c
 
 OBJECTS = $(FILES:.c=.o)
 
