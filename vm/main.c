@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 21:47:53 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/16 22:41:14 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/16 23:41:38 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,31 +22,6 @@ void	showerr(char *msg)
 
 
 
-void	writechamp(t_en *env)
-{
-	t_champ			*champ;
-	int	i;
-	int	j;
-
-	champ = env->champ;
-	i = 0;
-	while (champ)
-	{
-		j = -1;
-		ft_printf("%s\n", champ->name);
-		ft_printf("size = %d\n", champ->size);
-		ft_printf("pos = %d\n", i);
-		champ->pos = i;
-		while (++j < champ->size)
-		{
-			env->memory[i + j] = champ->code[j];
-			env->color[i + j] = champ->color;
-		}
-		i += MEM_SIZE / env->champnb;
-		champ = champ->next;
-	}
-}
-
 void	printmemory(t_en *env)
 {
 	int i;
@@ -61,10 +36,6 @@ void	printmemory(t_en *env)
 	}
 }
 
-
-
-
-
 void	envinit(t_en *env)
 {
 	env->champ = NULL;
@@ -78,7 +49,6 @@ t_proc	*procinit(t_champ *champ)
 	t_proc	*proc;
 
 	proc = (t_proc *)malloc(sizeof(t_proc));
-	// proc->id = champ->id;
 	proc->pc = champ->pos;
 	proc->color = champ->color;
 	proc->carry = 0;
@@ -88,6 +58,10 @@ t_proc	*procinit(t_champ *champ)
 	ft_bzero(proc->args, sizeof(int) * MAX_ARGS_NUMBER);
 	ft_bzero(proc->reg, sizeof(int) * REG_NUMBER);
 	proc->next = NULL;
+	if (champ->id)
+		proc->reg[0] = champ->id;
+	else
+		proc->reg[0] = champ->color - 30;
 	return (proc);
 }
 
@@ -205,6 +179,7 @@ void	launchproc(t_en *env)
 		ft_printf("arg0 = %d arg1 = %d arg2 = %d\n",
 			proc->args[0], proc->args[1], proc->args[2]);
 		ft_printf("op == %d acb == %x\n", proc->op, proc->acb);
+		ft_printf("id = %d\n", proc->reg[0]);
 		proc = proc->next;
 	}
 }

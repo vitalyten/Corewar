@@ -6,7 +6,7 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/13 22:55:15 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/16 22:40:34 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/16 23:40:39 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ typedef struct		s_op
 
 typedef struct		s_champ
 {
-	// int				id;
+	int				id;
 	char			*name;
 	char			*comment;
 	char			*code;
@@ -120,5 +120,7 @@ extern t_op			g_ops[17];
 void				showerr(char *msg);
 void				readchamp(t_en *env, char *file);
 t_champ				*champinit();
+void				writechamp(t_en *env);
+void				*revbytes(void *mem, size_t size);
 
 #endif

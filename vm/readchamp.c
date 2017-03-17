@@ -6,11 +6,36 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/16 22:38:58 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/16 22:41:25 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/03/16 23:34:51 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vm.h"
+
+void	writechamp(t_en *env)
+{
+	t_champ			*champ;
+	int	i;
+	int	j;
+
+	champ = env->champ;
+	i = 0;
+	while (champ)
+	{
+		j = -1;
+		ft_printf("%s\n", champ->name);
+		ft_printf("size = %d\n", champ->size);
+		ft_printf("pos = %d\n", i);
+		champ->pos = i;
+		while (++j < champ->size)
+		{
+			env->memory[i + j] = champ->code[j];
+			env->color[i + j] = champ->color;
+		}
+		i += MEM_SIZE / env->champnb;
+		champ = champ->next;
+	}
+}
 
 void	*revbytes(void *mem, size_t size)
 {
@@ -43,6 +68,7 @@ t_champ	*champinit()
 	t_champ *champ;
 
 	champ = (t_champ *)malloc(sizeof(t_champ));
+	champ->id = 0;
 	champ->next = NULL;
 	champ->alive = 1;
 	champ->color = 31;
