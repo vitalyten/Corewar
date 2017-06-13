@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   op.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zaz <zaz@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2013/10/04 11:43:01 by zaz               #+#    #+#             */
-/*   Updated: 2017/05/04 19:34:55 by vkannema         ###   ########.fr       */
+/*   Updated: 2017/05/17 18:51:21 by vtenigin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "vm.h"
+#include "asm.h"
 
 t_op	g_ops[17] =
 {
@@ -38,3 +38,17 @@ t_op	g_ops[17] =
 	{"aff", 1, {T_REG}, 16, 2, "aff", 1, 0},
 	{0, 0, {0}, 0, 0, 0, 0, 0}
 };
+
+void	validchamp(t_en *env)
+{
+	int len;
+
+	len = ft_strlen(env->header->prog_name);
+	if (len == 0)
+		showerr("empty champion name");
+	len = ft_strlen(env->header->comment);
+	if (len == 0)
+		showerr("empty comment");
+	if (env->header->prog_size == 0)
+		showerr("empty champion");
+}

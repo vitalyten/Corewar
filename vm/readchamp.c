@@ -6,94 +6,51 @@
 /*   By: vtenigin <vtenigin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/16 22:38:58 by vtenigin          #+#    #+#             */
-/*   Updated: 2017/03/16 23:34:51 by vtenigin         ###   ########.fr       */
+/*   Updated: 2017/05/30 15:21:46 by vkannema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vm.h"
 
-void	writechamp(t_en *env)
+void	fill_id(t_champ *champ, t_en *env)
 {
-	t_champ			*champ;
 	int	i;
-	int	j;
 
-	champ = env->champ;
 	i = 0;
-	while (champ)
+	while (i < 4 && env->assigned_table[i] != 0)
+		i++;
+	if (i < 4)
 	{
-		j = -1;
-		ft_printf("%s\n", champ->name);
-		ft_printf("size = %d\n", champ->size);
-		ft_printf("pos = %d\n", i);
-		champ->pos = i;
-		while (++j < champ->size)
-		{
-			env->memory[i + j] = champ->code[j];
-			env->color[i + j] = champ->color;
-		}
-		i += MEM_SIZE / env->champnb;
-		champ = champ->next;
+		env->assigned_table[i] = 1;
+		champ->id = -(i + 1);
 	}
 }
 
-void	*revbytes(void *mem, size_t size)
-{
-	char	*ret;
-	size_t	i;
-	size_t	j;
-
-	if (!(ret = malloc(size)))
-		showerr("malloc error");
-	i = 0;
-	j = size - 1;
-	while (i < size)
-		ret[i++] = ((char *)mem)[j--];
-	return ((void *)ret);
-}
-
-void	checkmagic(t_en *env)
-{
-	unsigned int	*m;
-	unsigned int	magic;
-
-	read(env->fd, &magic, sizeof(COREWAR_EXEC_MAGIC));
-	m = (unsigned int *)revbytes(&magic, sizeof(COREWAR_EXEC_MAGIC));
-	if (*m != COREWAR_EXEC_MAGIC)
-		showerr("wrong file magic");
-}
-
-t_champ	*champinit()
+t_champ	*champinit(t_en *env)
 {
 	t_champ *champ;
 
 	champ = (t_champ *)malloc(sizeof(t_champ));
-	champ->id = 0;
+	champ->assigned = 0;
+	if (env->assignement)
+	{
+		champ->id = env->assignement;
+		champ->assigned = 1;
+	}
+	else
+		fill_id(champ, env);
 	champ->next = NULL;
-	champ->alive = 1;
 	champ->color = 31;
 	champ->name = (char *)malloc(sizeof(char) * (PROG_NAME_LENGTH + 4));
 	champ->comment = (char *)malloc(sizeof(char) * (COMMENT_LENGTH + 4));
 	champ->code = (char *)malloc(sizeof(char) * CHAMP_MAX_SIZE);
 	return (champ);
 }
-void	readchamp(t_en *env, char *file)
-{
-	t_champ			*champ;
-	t_champ			*tmp;
-	unsigned int	size;
-	unsigned int	*s;
 
-	champ = champinit();
-	if ((env->fd = open(file, O_RDONLY)) == -1)
-		showerr("couldn't open file");
-	checkmagic(env);
-	read(env->fd, champ->name, PROG_NAME_LENGTH + 4);
-	read(env->fd, &size, sizeof(int));
-	s = (unsigned int *)revbytes(&size, sizeof(int));
-	if ((champ->size = *s) > CHAMP_MAX_SIZE)
-		showerr("champion is too big");
-	free(s);
+void	readchamp2(t_en *env, t_champ *champ)
+{
+	t_champ			*tmp;
+
 	read(env->fd, champ->comment, COMMENT_LENGTH + 4);
 	read(env->fd, champ->code, champ->size);
 	if (++env->champnb > 4)
@@ -111,9 +68,24 @@ void	readchamp(t_en *env, char *file)
 		}
 		tmp->next = champ;
 	}
-	// ft_printf("%d\n", champ->size);
-	// ft_printf("%s\n", champ->name);
-	// ft_printf("%s\n", champ->comment);
-	// ft_printf("%c\n", champ->code[1]);
+}
 
+int		readchamp(t_en *env, char *file)
+{
+	t_champ			*champ;
+	unsigned int	size;
+	unsigned int	*s;
+
+	champ = champinit(env);
+	if ((env->fd = open(file, O_RDONLY)) == -1)
+		showerr("couldn't open file");
+	checkmagic(env);
+	read(env->fd, champ->name, PROG_NAME_LENGTH + 4);
+	read(env->fd, &size, sizeof(int));
+	s = (unsigned int *)revbytes(&size, sizeof(int));
+	if ((champ->size = *s) > CHAMP_MAX_SIZE)
+		showerr("champion is too big");
+	free(s);
+	readchamp2(env, champ);
+	return (1);
 }
